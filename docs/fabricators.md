@@ -1,28 +1,36 @@
 # Fabricators
 
-Who could make the ring's circuit, checked against public capability pages in November 2026.
+Who could make the ring's circuit, checked against public capability pages in November 2026,
+and what the routed board asks of them.
 Pages from the fabricators themselves; several are old or disagree with each other, so every
 figure here is to be confirmed in a quote.
 
 ## What the circuit asks for
 
-- A flat rigid-flex strip, bent into the ring after assembly (flex-to-install, IPC-2223 Use A).
-  Six rigid islands, two-layer flex between them, 5.6 mm wide.
-- The nRF54L15 CSP47 has a 0.3 mm pitch. Nordic's reference layout puts a laser microvia in
-  every pad: **0.1 mm hole, 0.2 mm pad** (figures reported on Nordic's forum; to be read from the
-  reference layout files, CAAA v0.7). A fabricator whose minimum microvia pad is above 0.2 mm
-  cannot build that footprint as drawn.
-- Microvia aspect ratio about 1:1 or less, so the dielectric under the first layer must be thin.
-- Bend radius: inner ring radius about 9 mm. A two-layer flex wants about 10-15 times its
-  thickness (PCBWay's rule for multilayer flex), so 1.5-2.5 mm. Not a constraint.
+From the routed board (see "Board" in [design.md](design.md)):
+
+- A flat rigid-flex strip, bent into the ring after assembly (flex-to-install, IPC-2223 Use A),
+  5.6 mm wide and about 35 mm long.
+- **Six copper layers on all six islands**, all rigid, about 0.45 mm (estimate). Layers 3 and 4
+  continue through the bends as a two-layer flex; layer 3 is a ground plane end to end.
+- **Any-layer HDI**: 236 laser vias, 124 between neighbouring layers and 112 stacked across three
+  or more layers, a few across all six. Rigid HDI fabs call this ELIC; combined with rigid-flex
+  it is an engineering quote everywhere, never an instant price.
+- Via in pad on the three WLCSPs and on 0201 pads, so the vias are copper filled and capped.
+- 0.1 mm laser hole in a **0.2 mm pad**, as in Nordic's reference layout for the nRF54L15 CSP47
+  (0.3 mm pitch; figures reported on Nordic's forum, to be read from reference layout CAAA v0.7).
+  A fabricator whose minimum microvia pad is above 0.2 mm cannot build that footprint as drawn.
+- 0.075 mm track and gap, 0.2 mm hole to hole, 0.15 mm copper to board edge, no vias in the bends.
+- Microvia aspect ratio about 1:1 or less, so thin dielectric between layers.
+- Bend radius: inner ring radius about 9 mm; a two-layer flex wants 1.5-2.5 mm. Not a constraint.
 - Assembly of three WLCSP parts on both faces, with X-ray inspection.
 
 ## Comparison
 
 | Fabricator | Rigid-flex | Laser microvia | Microvia pad | Assembly | Ordering | Fit |
 | --- | --- | --- | --- | --- | --- | --- |
-| PCBWay (CN) | Yes, up to 32 layers; HDI rigid-flex examples (2+1+2F+1+2) | 0.076-0.1 mm (old table); 2 mil listed for laser | Not published; 0.35 mm on the plain rigid-flex page | Yes, 3D X-ray (AXI) | Instant quote for basics, sales for HDI | Best candidate for prototypes; confirm the 0.2 mm pad |
-| NextPCB (CN) | Yes, 20 rigid / 8 flex layers (catalog says 32 / 6) | 0.075-0.15 mm, 1:1 max | Not published | Yes | Advanced quote form | Second candidate |
+| PCBWay (CN) | Yes, up to 32 layers; HDI rigid-flex examples (2+1+2F+1+2) | 0.076-0.1 mm (old table); 2 mil listed for laser; lists "arbitrary interconnection" (any-layer) HDI for rigid boards | Not published; 0.35 mm on the plain rigid-flex page | Yes, 3D X-ray (AXI) | Instant quote for basics, sales for HDI | Best candidate for prototypes; confirm the 0.2 mm pad and any-layer in rigid-flex |
+| NextPCB (CN) | Yes, 20 rigid / 8 flex layers (catalog says 32 / 6) | 0.075-0.15 mm, 1:1 max; ELIC listed for rigid HDI | Not published | Yes | Advanced quote form | Second candidate; confirm ELIC in rigid-flex |
 | JLCPCB (CN) | **No**: flex only, 1-4 layers; "rigid-flex not yet supported" | No | - | Yes | Instant, from $2 for 5 flex boards | Mechanical dummies only |
 | Würth Elektronik / WEdirekt (DE) | Yes, RIGID.flex with HDI | 0.1 mm | 0.275-0.30 mm standard; **0.35 mm** in the online shop | Via partners | Online shop for standard builds | Pad too large for the CSP47 as drawn |
 | Eurocircuits (BE) | No polyimide rigid-flex; FR-4 SEMI-FLEX, 4-6 layers, 5 mm bend radius, 5 bends | HDI pool, L1-L2 laser, filled | **0.21-0.23 mm** | Yes | Pool, online | Just too large; SEMI-FLEX is too thick for a ring |
@@ -36,10 +44,17 @@ figure here is to be confirmed in a quote.
 1. **Now:** two-layer flex from JLCPCB (or PCBWay), same outline and thickness as the real
    strip, with copper dummies for the islands. A few euros. It tests bending, the fit in the
    printed shell and the cell tabs.
-2. **First real build:** ask PCBWay and NextPCB for a quote on the full rigid-flex with the
-   stackup and the CSP47 footprint attached, and ask three questions explicitly: minimum
-   laser microvia pad (need 0.2 mm), filled and capped via-in-pad on the islands, X-ray of
-   the WLCSP joints on both faces.
+2. **First real build:** ask PCBWay and NextPCB for a quote on the full rigid-flex, sending the
+   KiCad board and these questions:
+   - minimum laser microvia pad (need 0.2 mm with a 0.1 mm hole);
+   - stacked microvias across all six layers inside a rigid-flex (any-layer), or only
+     staggered, or only up to a given number of stacked levels;
+   - copper-filled, capped via in pad on WLCSP and 0201 pads;
+   - their six-layer rigid-flex stackup with layers 3-4 as the flex, and its island thickness;
+   - 0.075 mm track and gap on every layer, and on the flex;
+   - X-ray of the WLCSP joints on both faces.
+   Their answers go to the board router (constants at the top of `electrical/gen/router.py` and
+   `electrical/gen/board.py`; `make route` reroutes).
 3. **If both refuse or the yield is poor:** Sierra Circuits for a prototype with assembly in
    one place, or Somacis / Cistelaier for a European source, through a direct quote.
 
