@@ -4,7 +4,7 @@ import math
 from . import stack as S
 from .checks import _boxes, arc_report, best_cell, cell_report, island_report
 from .params import ENVELOPES
-from .profile import cavity_outline, half_wall_at, outline
+from .profile import outline, shell_outline
 
 INK, TI, RESIN, BOARD, PART, CELL = "#222", "#b9b2a6", "#f1ead9", "#3d7a4f", "#33475b", "#c2603c"
 
@@ -60,11 +60,7 @@ def section(key: str, island_name: str) -> str:
     rp = (island_report(p, parts, isl)["plane_radius"] or p.mean_radius) - p.mean_radius
     flip = lambda pts: [(y, -rho) for rho, y in pts]
     body = _poly(flip(outline(p)), TI)
-    w = p.half_width - p.t_ti
-    ys = [-w + 2 * w * i / 79 for i in range(80)]
-    top = [c for c in cavity_outline(p) if c[0] > 0 or True]
-    resin = top[: len(top) // 2] + [(-half_wall_at(p, y), y) for y in reversed(ys)]
-    body += _poly(flip(resin), RESIN, sw=0.02)
+    body = _poly(flip(outline(p)), RESIN) + _poly(flip(shell_outline(p)), TI)
     for _, _, y0, y1, z0, z1, is_part in _boxes(parts, isl):
         body += _poly(flip([(rp + z0, y0), (rp + z1, y0), (rp + z1, y1), (rp + z0, y1)]),
                       PART if is_part else BOARD, sw=0.015)

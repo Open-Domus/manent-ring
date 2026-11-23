@@ -5,7 +5,7 @@ from itertools import combinations
 
 from . import stack as S
 from .params import ENVELOPES, RingParams
-from .profile import cavity_height, in_cavity, sdf
+from .profile import cavity_height, in_cavity, in_titanium, sdf
 
 
 
@@ -23,6 +23,8 @@ def _boxes(parts, isl):
     t = isl.thickness / 2
     out = [(-isl.length / 2, isl.length / 2, -S.FLEX_WIDTH / 2, S.FLEX_WIDTH / 2, -t, t, False)]
     for pl in isl.parts:
+        if not pl.fitted:                   # a land pattern with nothing on it takes no height
+            continue
         l, w, h = _size(parts, pl)
         z = (t, t + S.SOLDER + h) if pl.face == "out" else (-t - S.SOLDER - h, -t)
         out.append((pl.x - l / 2, pl.x + l / 2, pl.y - w / 2, pl.y + w / 2, z[0], z[1], True))
@@ -61,7 +63,17 @@ def _clearance(p, boxes):
     return lo
 
 
+_ISLAND_CACHE: dict = {}
+
+
 def island_report(p: RingParams, parts, isl) -> dict:
+    key = (p, isl)
+    if key not in _ISLAND_CACHE:
+        _ISLAND_CACHE[key] = _island_report(p, parts, isl)
+    return _ISLAND_CACHE[key]
+
+
+def _island_report(p: RingParams, parts, isl) -> dict:
     boxes = _boxes(parts, isl)
     c = _clearance(p, boxes)
     rng = _range(p, boxes, min(c, p.gap))
@@ -79,7 +91,7 @@ def island_report(p: RingParams, parts, isl) -> dict:
                              and a[2] < b[3] + SPACING and b[2] < a[3] + SPACING):
             problems.append(f"{a[5]} and {b[5]} overlap")
     stack_h = isl.thickness + sum(
-        max((_size(parts, pl)[2] + S.SOLDER for pl in isl.parts if pl.face == f), default=0.0)
+        max((_size(parts, pl)[2] + S.SOLDER for pl in isl.parts if pl.face == f and pl.fitted), default=0.0)
         for f in ("in", "out"))
     return {"island": isl.name, "length": isl.length, "stack_height": round(stack_h, 3),
             "clearance": round(c, 3), "plane_radius": round({"mid": sum(rng) / 2, "out": rng[1], "in": rng[0]}[isl.seat], 3) if rng else None,
@@ -110,28 +122,66 @@ def cell_report(p: RingParams, parts, key: str) -> dict:
             "ok": lo >= S.CELL_GAP}
 
 
+FLEX_SLACK = 0.15       # flex beyond the straight distance between two board ends
+MIN_BEND_RATIO = 10     # fold radius over flex thickness, for a flex bent once
+
+
+def chain(p: RingParams, parts) -> dict:
+    """Lay the islands one after the other round the ring. Each is a flat board at its own
+    depth in the wall; the flex between two of them is FLEX_SLACK longer than the straight
+    distance between their ends. Angles are in degrees from the tab end of the cell."""
+    def ends(isl, deg):
+        r = island_report(p, parts, isl)["plane_radius"] or p.mean_radius
+        a = math.radians(deg)
+        c, t = (r * math.cos(a), r * math.sin(a)), (-math.sin(a), math.cos(a))
+        h = isl.length / 2
+        return (c[0] - t[0] * h, c[1] - t[1] * h), (c[0] + t[0] * h, c[1] + t[1] * h), r
+
+    mm = lambda length: math.degrees(length / p.mean_radius)
+    centres, bends, prev, deg = {}, [], None, mm(S.CELL_TABS + S.BENDS[0])
+    for i, isl in enumerate(S.ISLANDS):
+        half = math.degrees(math.atan2(isl.length / 2, island_report(p, parts, isl)["plane_radius"] or p.mean_radius))
+        if prev is None:
+            centre = deg + half
+        else:
+            want = S.BENDS[i] - FLEX_SLACK
+            lo = prev[1] + prev[3] + half             # board ends level with each other
+            hi = lo + 40.0
+            for _ in range(50):
+                m = (lo + hi) / 2
+                if math.dist(prev[0], ends(isl, m)[0]) < want:
+                    lo = m
+                else:
+                    hi = m
+            centre = hi
+            start, _, r = ends(isl, centre)
+            turn = math.radians(centre - prev[1])
+            radius = S.BENDS[i] / turn if turn > 0 else float("inf")
+            reachable = math.dist(prev[0], start) <= want + 1e-6
+            bends.append({"between": f"{S.ISLANDS[i - 1].name} - {isl.name}", "flex": S.BENDS[i],
+                          "depth_step": round(abs(r - prev[2]), 2), "fold_radius": round(radius, 2),
+                          "radius_over_thickness": round(radius / S.FLEX_T),
+                          "ok": reachable and centre - half > prev[1] + prev[3] and radius / S.FLEX_T >= MIN_BEND_RATIO})
+        centres[isl.name] = centre
+        prev = (ends(isl, centre)[1], centre, ends(isl, centre)[2], half)
+    total = prev[1] + prev[3] + mm(S.BENDS[-1])
+    return {"centres": centres, "bends": bends, "total_deg": total}
+
+
 def arc_report(p: RingParams, parts, cell_key: str) -> dict:
-    """Lay the islands along the arc after the cell tabs, with the button at BUTTON_DEG;
-    whatever arc is left over sits between the last island and the far end of the cell."""
+    """Place the chain of islands with the button at BUTTON_DEG; whatever arc is left over
+    lies between the last island and the far end of the cell."""
     cell = cell_report(p, parts, cell_key)
-    r = p.mean_radius
-    mm = lambda length: math.degrees(length / r)
-    ang, centres = mm(S.CELL_TABS), {}
-    for isl in S.ISLANDS:
-        ang += mm(S.BEND)
-        centres[isl.name] = ang + mm(isl.length) / 2
-        ang += mm(isl.length)
-    ang += mm(S.BEND)
-    start = S.BUTTON_DEG - centres["button"]            # angle of the tab end of the cell
-    slack_mm = math.radians(360.0 - cell["arc_deg"] - ang) * r - S.CLOSING_GAP
+    ch = chain(p, parts)
+    start = S.BUTTON_DEG - ch["centres"]["button"]      # angle of the tab end of the cell
+    slack_mm = math.radians(360.0 - cell["arc_deg"] - ch["total_deg"]) * p.mean_radius - S.CLOSING_GAP
     placed, problems = [], []
     for isl in S.ISLANDS:
-        centre = start + centres[isl.name]
+        centre = start + ch["centres"][isl.name]
         placed.append({"island": isl.name, "centre_deg": round(centre, 1)})
         if isl.target_deg and not isl.target_deg[0] <= centre <= isl.target_deg[1]:
             problems.append(f"{isl.name} at {centre:.0f} deg, wanted {isl.target_deg}")
-    used = S.CELL_TABS + sum(i.length for i in S.ISLANDS) + S.BEND * (len(S.ISLANDS) + 1)
-    return {"electronics_mm": round(used, 2), "cell_arc_deg": cell["arc_deg"],
+    return {"electronics_mm": round(math.radians(ch["total_deg"]) * p.mean_radius, 2), "cell_arc_deg": cell["arc_deg"],
             "cell_centre_deg": round(start - cell["arc_deg"] / 2, 1),
             "slack_mm": round(slack_mm, 2), "placed": placed,
             "ok": slack_mm >= 0 and not problems, "problems": problems}
@@ -140,8 +190,7 @@ def arc_report(p: RingParams, parts, cell_key: str) -> dict:
 def max_cell_length(p: RingParams, parts, cell_key: str) -> float:
     """Longest cell of this cross-section that leaves room for the electronics."""
     cell = cell_report(p, parts, cell_key)
-    used = S.CELL_TABS + sum(i.length for i in S.ISLANDS) + S.BEND * (len(S.ISLANDS) + 1)
-    free = 2 * math.pi * p.mean_radius - used - S.CLOSING_GAP
+    free = math.radians(360.0 - chain(p, parts)["total_deg"]) * p.mean_radius - S.CLOSING_GAP
     return free * cell["radius"] / p.mean_radius
 
 
@@ -158,7 +207,7 @@ def mass_report(p: RingParams) -> dict:
             if d >= 0:
                 continue
             ring = 2 * math.pi * (p.mean_radius + rho) * dr * dy
-            if abs(y) > p.half_width - p.t_ti or (rho > 0 and d > -p.t_ti):
+            if in_titanium(p, rho, y):
                 ti += ring
             else:
                 fill += ring
@@ -166,9 +215,14 @@ def mass_report(p: RingParams) -> dict:
             "total_g_estimate": round(ti * 4.43e-3 + fill * 1.6e-3, 2)}
 
 
-def flex_report(p: RingParams) -> dict:
-    ratio = (p.mean_radius - 1.0) / S.FLEX_T
-    return {"bend_radius_over_thickness": round(ratio, 0), "minimum": 10, "ok": ratio >= 10}
+def board_length() -> float:
+    """Length of the flat board, tabs to the end of the last island."""
+    assert len(S.BENDS) == len(S.ISLANDS) + 1
+    return S.CELL_TABS + sum(i.length for i in S.ISLANDS) + sum(S.BENDS[:-1])
+
+
+def bend_report(p: RingParams, parts) -> list[dict]:
+    return chain(p, parts)["bends"]
 
 
 def envelope_report(key: str, us_size: float | None = None, cell_key: str | None = None) -> dict:
@@ -178,15 +232,37 @@ def envelope_report(key: str, us_size: float | None = None, cell_key: str | None
     islands = [island_report(p, parts, i) for i in S.ISLANDS]
     cell = cell_report(p, parts, cell_key)
     arc = arc_report(p, parts, cell_key)
+    bends = bend_report(p, parts)
     return {
         "envelope": p.name, "us_size": round(p.us_size, 2),
         "band_width": p.band_width, "wall_edge": round(p.wall_edge, 2),
         "wall_centre": round(p.wall_centre, 2),
         "inner_diameter": round(p.inner_diameter_min, 2), "outer_diameter": round(p.outer_diameter, 2),
         "cavity_height": {str(w): round(cavity_height(p, w), 2) for w in (4.0, 5.0, 5.6, 6.0, 6.5)},
-        "islands": islands, "cell": cell, "arc": arc, "flex": flex_report(p), "mass": mass_report(p),
-        "ok": all(i["ok"] for i in islands) and cell["ok"] and arc["ok"],
+        "islands": islands, "cell": cell, "arc": arc, "bends": bends, "mass": mass_report(p),
+        "ok": all(i["ok"] for i in islands) and cell["ok"] and arc["ok"] and all(b["ok"] for b in bends),
     }
+
+
+def sensitivity(key: str = "B") -> list[dict]:
+    """How the tightest island and the cell respond to the two least certain numbers."""
+    from dataclasses import replace
+    parts, p = S.load_parts(), ENVELOPES[key]
+    rows = []
+    for t in (0.40, 0.45, 0.50, 0.55, 0.60):
+        worst = min(island_report(p, parts, replace(i, thickness=t))["clearance"] for i in S.ISLANDS)
+        rows.append({"what": f"island thickness {t:.2f}", "margin": round(worst - p.gap, 3), "ok": worst >= p.gap})
+    nominal = S.SWELL
+    try:
+        for swell in (0.0, 0.05, 0.08, 0.10):
+            S.SWELL = swell
+            for key, cell in parts["cells"].items():
+                c = cell_report(p, parts, key)["clearance"]
+                rows.append({"what": f"{cell['mpn']} ({cell['size'][2]} x {cell['size'][1]}) swollen {swell:.0%}",
+                             "margin": round(c - S.CELL_GAP, 3), "ok": c >= S.CELL_GAP})
+    finally:
+        S.SWELL = nominal
+    return rows
 
 
 def best_cell(p: RingParams, parts) -> str | None:
@@ -196,14 +272,20 @@ def best_cell(p: RingParams, parts) -> str | None:
     return max(fitting)[1] if fitting else None
 
 
-def size_sweep(key: str, sizes=range(6, 14)) -> list[dict]:
+def islands_ok(p: RingParams, parts) -> bool:
+    return all(island_report(p, parts, i)["ok"] for i in S.ISLANDS)
+
+
+def size_sweep(key: str, sizes=S.SIZES) -> list[dict]:
     parts = S.load_parts()
     rows = []
     for size in sizes:
         p = ENVELOPES[key].for_size(size)
         ck = best_cell(p, parts)
         best = (parts["cells"][ck]["capacity_mah"], ck) if ck else None
+        worst = min(island_report(p, parts, i)["clearance"] for i in S.ISLANDS)
         rows.append({"us_size": size, "inner_diameter": round(p.inner_diameter_min, 2),
+                     "islands_fit": worst >= p.gap, "tightest_island": round(worst, 3),
                      "max_cell_length": round(max_cell_length(p, parts, S.DEFAULT_CELL[key]), 1),
                      "best_cell": best[1] if best else None,
                      "capacity_mah": best[0] if best else None})
@@ -212,7 +294,7 @@ def size_sweep(key: str, sizes=range(6, 14)) -> list[dict]:
 
 def full_report() -> dict:
     return {"envelopes": {k: envelope_report(k) for k in ENVELOPES},
-            "size_sweep": {k: size_sweep(k) for k in ENVELOPES}}
+            "size_sweep": {k: size_sweep(k) for k in ENVELOPES}, "sensitivity": sensitivity()}
 
 
 if __name__ == "__main__":
@@ -233,9 +315,15 @@ if __name__ == "__main__":
         print(f"  arc: electronics {a['electronics_mm']} mm, slack {a['slack_mm']:+.1f} mm  "
               f"{'ok' if a['ok'] else 'FAIL'} {'; '.join(a['problems'])}")
         print("   ", ", ".join(f"{x['island']}@{x['centre_deg']:.0f}" for x in a["placed"]))
+        for b in e["bends"]:
+            print(f"  bend {b['between']:<20} flex {b['flex']:.1f}  depth step {b['depth_step']:.2f}"
+                  f"  fold r/t {b['radius_over_thickness']:.0f}  {'ok' if b['ok'] else 'FAIL'}")
         print("  mass:", e["mass"])
     for k, rows in rep["size_sweep"].items():
         print(f"\n== sizes, envelope {k}")
         for r in rows:
             print(f"  US {r['us_size']:>2}  inner {r['inner_diameter']:.2f}  max cell {r['max_cell_length']:.1f} mm"
-                  f"  best {r['best_cell']} ({r['capacity_mah']} mAh)")
+                  f"  best {r['best_cell']} ({r['capacity_mah']} mAh)"
+                  f"  islands {'fit' if r['islands_fit'] else 'DO NOT FIT'} ({r['tightest_island']:+.3f})")
+    for r in rep["sensitivity"]:
+        print(f"  {r['what']}: margin {r['margin']:+.3f}  {'ok' if r['ok'] else 'FAIL'}")

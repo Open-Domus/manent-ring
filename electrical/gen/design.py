@@ -130,7 +130,7 @@ TVS = two_pin("TVS", "D")
 
 # Which SoC pin does what. The checks in checks.py verify the clock-pin and port rules.
 SOC_NETS = {
-    "P0.00": "BTN_WAKE", "P0.01": "PMIC_INT", "P0.02": "I2C_SDA", "P0.03": "I2C_SCL", "P0.04": "LED_AUX",
+    "P0.01": "PMIC_INT", "P0.02": "I2C_SDA", "P0.03": "I2C_SCL", "P0.04": "LED_AUX",
     "P1.00/XL1": "XL1", "P1.01/XL2": "XL2",
     "P1.04": "PDM_CLK", "P1.05": "PDM_DIN", "P1.06": "MIC_THSEL", "P1.07": "MIC_WAKE",
     "P1.13": "MIC_EN", "P1.14": "UART_TX", "P1.15": "UART_RX",
@@ -161,14 +161,15 @@ def build() -> list[Component]:
 
     # ---- power -------------------------------------------------------------------
     add(PMIC, "nPM1304", "power", by_name(PMIC, {
-        "VBUS": "VBUS", "VBUSOUT": "VBUSOUT", "CC1": "GND", "CC2": "GND", "VBAT": "VBAT", "NTC": "GND",
+        "VBUS": "VBUS", "VBUSOUT": "VBUSOUT", "CC1": "GND", "CC2": "GND", "VBAT": "VBAT", "NTC": "NTC",
         "VSYS": "VSYS", "PVDD": "VSYS", "VDDIO": "V1V8", "AVSS": "GND", "PVSS1": "GND", "PVSS2": "GND",
         "VSET1": "VSET1", "VSET2": "GND", "SHPHLD": "BTN_N", "SW1": "SW1", "VOUT1": "V1V8",
         "VOUT2": "GND", "LSIN1": "V1V8", "LSOUT1": "VMIC", "LSIN2": "V1V8", "LSOUT2": "VFLASH",
         "SCL": "I2C_SCL", "SDA": "I2C_SDA", "GPIO0": "PMIC_INT", "GPIO1": "MIC_EN",
     }), mpn="nPM1304-CAAA-R", mfr="Nordic Semiconductor", package="WLCSP-35",
         note="BUCK2 unused: VSET2 grounded as documented; SW2 open and VOUT2 grounded are not confirmed. "
-             "LED0-2, GPIO2-3 left open: not confirmed. NTC grounded: set DISABLENTC in firmware")
+             "LED0-2, GPIO2-3 left open: not confirmed")
+    res("10k NTC", "NTC", "GND", "power", note="Thermistor, to sit against the cell: stops charging when hot or cold")
     add(L, "2.2uH", "power", ("SW1", "V1V8"), mpn="to choose", package="0603",
         note="DCR <= 0.4 ohm, Isat > 350 mA; part and height to choose")
     res("47k", "VSET1", "GND", "power", note="Sets BUCK1 to 1.8 V at power-on")
@@ -179,10 +180,12 @@ def build() -> list[Component]:
     cap("10uF", "V1V8", "power", pkg="0402", note="Buck output: at least 4 uF effective")
     cap("100nF", "V1V8", "power", note="VDDIO")
     cap("1uF", "VMIC", "power", note="Load switch output; value to confirm")
+    res("470k", "VMIC", "GND", "power", note="Empties the rail when the switch opens, so the light goes out with the microphone")
     cap("1uF", "VFLASH", "power", note="Load switch output; value to confirm")
     res("10k", "I2C_SCL", "V1V8", "power")
     res("10k", "I2C_SDA", "V1V8", "power")
-    add(TVS, "5.5V bidirectional", "power", ("VBUS", "GND"), mpn="ESD230-B1-W0201", mfr="Infineon", package="0201")
+    add(TVS, "5.5V unidirectional", "power", ("VBUS", "GND"), mpn="to choose", package="0201",
+        note="Pin 1 is the cathode. Unidirectional, so that a negative strike is clamped near -0.7 V")
     add(PAD, "charge +", "power", ("VBUS",), note="Centre pad on the inner surface")
     add(PAD, "charge -", "power", ("GND",), note="Outer pad; two of them make the dock reversible")
     add(PAD, "charge -", "power", ("GND",))
@@ -195,17 +198,20 @@ def build() -> list[Component]:
         note="Capacity depends on ring size; see docs/space-budget.md")
     add(FLAG, "PWR_FLAG", "power", ("VBAT",))
     res("330", "VBAT", "CELL_P", "power", note="Protector supply filter")
-    cap("100nF", "CELL_P", "power")
+    cap("1uF", "CELL_P", "power", note="With the 330 ohm: at least 100 uF x ohm, as the protector asks")
     comps[-1].nets = {"1": "CELL_P", "2": "CELL_N"}
     add(PROT, "S-82A1A", "power", by_name(PROT, {"VSS": "CELL_N", "VDD": "CELL_P", "VINI": "SENSE",
                                                  "VM": "VM", "CO": "PROT_CO", "DO": "PROT_DO"}),
         mpn="S-82A1AAG-A6T5S (variant to confirm)", mfr="ABLIC", package="DFN-6 1.4x1.4",
-        note="Fit only if the cell has no protection of its own; thresholds to match the charge voltage")
-    res("0.25", "CELL_N", "SENSE", "power", note="Overcurrent sense: about 200 mA trip (calculated, not from a datasheet)")
+        note="Fit only if the cell has no protection of its own. This variant trips at 4.23 V: right for a "
+             "4.20 V cell with little margin, wrong for a 4.35 V one. Choose with the cell")
+    res("0.5", "CELL_N", "SENSE", "power",
+        note="Overcurrent sense: trips at 100 mA out and 60 mA in (50 mV and 30 mV thresholds); to check against peaks")
     res("470", "VM", "GND", "power")
-    add(NFET, "N-MOSFET", "power", {"1": "PROT_DO", "2": "SENSE", "3": "FET_MID"}, mpn="to choose",
-        note="Discharge FET; a dual common-drain part in about 1x1 mm")
-    add(NFET, "N-MOSFET", "power", {"1": "PROT_CO", "2": "GND", "3": "FET_MID"}, mpn="to choose", note="Charge FET")
+    add(NFET, "N-MOSFET, low resistance", "power", {"1": "PROT_DO", "2": "SENSE", "3": "FET_MID"}, mpn="to choose",
+        note="Discharge FET; carries the cell current")
+    add(NFET, "N-MOSFET, low resistance", "power", {"1": "PROT_CO", "2": "GND", "3": "FET_MID"}, mpn="to choose",
+        note="Charge FET; carries the cell current")
 
     # ---- microcontroller and radio (Nordic CAAA reference circuit 0.7, DC/DC, NFC off) --
     add(SOC, "nRF54L15", "mcu_rf", by_name(SOC, {
@@ -260,19 +266,18 @@ def build() -> list[Component]:
 
     # ---- button, light, pads -----------------------------------------------------------
     add(SW, "tactile", "ui", ("BTN_N", "GND"), mpn="EVPBB2A9B000", mfr="Panasonic", package="2.6x1.6x0.53",
-        note="1.6 N; pulled up inside the PMIC (SHPHLD)")
-    add(D, "Schottky", "ui", ("BTN_N", "BTN_WAKE"), mpn="RB521ZS-30", mfr="Rohm", package="0201 class",
-        note="Pin 1 is the cathode. Anode at the SoC: keeps the PMIC pull-up voltage off the 1.8 V pin")
+        note="1.6 N; pulled up inside the PMIC (SHPHLD). The SoC learns of presses from the PMIC interrupt")
     add(LED, "red", "ui", ("LED_K", "VSYS"), mpn="SML-P11VT", mfr="Rohm", package="1.0x0.6x0.2",
         note="Pin 1 is the cathode. For the wearer only: about 0.1 mA")
     res("22k", "LED_K", "LED_SW", "ui", note="About 0.06-0.11 mA over the cell voltage; adjust after a look through the resin")
-    add(NFET, "N-MOSFET", "ui", {"1": "VMIC", "2": "GND", "3": "LED_SW"}, mpn="to choose",
+    add(NFET, "N-MOSFET, small signal", "ui", {"1": "VMIC", "2": "GND", "3": "LED_SW"}, mpn="to choose",
         note="Gate is the microphone rail: the light is on whenever the microphone has power. Vgs(th) under 1 V")
-    add(NFET, "N-MOSFET", "ui", {"1": "LED_AUX", "2": "GND", "3": "LED_SW"}, mpn="to choose",
+    add(NFET, "N-MOSFET, small signal", "ui", {"1": "LED_AUX", "2": "GND", "3": "LED_SW"}, mpn="to choose",
         note="Lets firmware blink the light for errors and charging")
     res("100k", "LED_AUX", "GND", "ui", note="Light off while the SoC is in reset")
     for label, net in (("SWDIO", "SWDIO"), ("SWDCLK", "SWDCLK")):
-        add(PAD, label, "ui", (net,), note="Service pad on the inner surface: reachable after potting")
+        res("100", net, net + "_PAD", "ui", note="Between the chip and a pad that touches the skin")
+        add(PAD, label, "ui", (net + "_PAD",), note="Service pad on the inner surface: reachable after potting")
     for label, net in (("nRESET", "NRESET"), ("UART TX", "UART_TX"), ("UART RX", "UART_RX"), ("1V8", "V1V8"),
                        ("GND", "GND"), ("VBAT", "VBAT"), ("VBUS", "VBUS")):
         add(PAD, label, "ui", (net,), note="Test tail, cut off before potting")

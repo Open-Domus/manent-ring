@@ -25,7 +25,7 @@ parts:
     manufacturer: Winbond
     mpn: W25Q128JWYIQ
     package: WLCSP-21
-    size: [3.3, 2.7, 0.46]
+    size: [3.4, 3.0, 0.46]
     status: unverified       # height verified; body not published, estimated from the 2.5 mm ball array
     url: https://www.winbond.com/hq/product/code-storage-flash-memory/serial-nor-flash/?__locale=en&partNo=W25Q128JW
   mic:
@@ -41,7 +41,7 @@ parts:
     manufacturer: Panasonic
     mpn: EVPBB2A9B000
     package: SMD 2.6 x 1.6
-    size: [2.6, 1.6, 0.55]
+    size: [2.6, 1.6, 0.53]
     status: secondary
     url: https://na.industrial.panasonic.com/products/switches-encoders-interface-devices/switches/series/79137
   led:
@@ -100,21 +100,29 @@ parts:
     size: [2.0, 1.2, 0.6]
     status: secondary        # part from Nordic's reference list; height not checked
     url: ""
+  inductor0402:
+    function: 4.7 uH inductor of the SoC's converter
+    manufacturer: TDK
+    mpn: PLEA67BCA4R7M-1PT00
+    package: "0402"
+    size: [1.0, 0.6, 0.7]
+    status: unverified       # height from memory; the part is in Nordic's reference list
+    url: ""
   passive0201:
     function: Resistor or capacitor
     manufacturer: generic
     mpn: "0201"
     package: "0201"
     size: [0.6, 0.3, 0.3]
-    status: verified
+    status: secondary        # generic chip size; individual parts differ in height
     url: ""
   passive0402:
     function: Bulk capacitor
     manufacturer: generic
     mpn: "0402"
     package: "0402"
-    size: [1.0, 0.5, 0.55]
-    status: verified
+    size: [1.0, 0.5, 0.65]
+    status: secondary        # 10 uF parts run 0.5 to 0.7 tall; the upper end is used
     url: ""
 
 # Curved lithium-polymer cells. size: [arc length, axial width, thickness].
@@ -128,14 +136,14 @@ cells:
     url: https://www.grepow.com/wearables/smart-ring.html
   grp1707_22:
     manufacturer: Grepow
-    mpn: GRP1707xx, 22 mm (exact code to confirm)
+    mpn: GRP170722
     size: [22.0, 6.5, 1.7]
     capacity_mah: 14.5
     status: secondary
     url: https://www.grepow.com/wearables/smart-ring.html
   grp1707_29:
     manufacturer: Grepow
-    mpn: GRP1707xx, 29 mm (exact code to confirm)
+    mpn: GRP170729
     size: [29.0, 6.5, 1.7]
     capacity_mah: 21.5
     status: secondary

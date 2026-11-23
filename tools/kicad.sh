@@ -21,7 +21,7 @@ board)
   # Places the parts, then adds the tracks saved in out/routes.json.
   py gen/pcb_build.py
   py gen/pcb_route.py
-  run kicad-cli pcb drc --format json --severity-all --schematic-parity -o ../out/drc.json manent.kicad_pcb
+  run kicad-cli pcb drc --format json --severity-all --schematic-parity --exit-code-violations -o ../out/drc.json manent.kicad_pcb
   for layer in F.Cu In1.Cu In2.Cu In3.Cu In4.Cu B.Cu; do
     run kicad-cli pcb export svg --mode-single --page-size-mode 2 --exclude-drawing-sheet \
       --layers "$layer,Edge.Cuts,Dwgs.User" -o "../out/board-$layer.svg" manent.kicad_pcb
@@ -35,10 +35,10 @@ quote)
     -o ../out/quote/gerber/ manent.kicad_pcb
   run kicad-cli pcb export drill --format excellon --excellon-separate-th --generate-map --map-format pdf \
     -o ../out/quote/drill/ manent.kicad_pcb
-  run kicad-cli pcb export pos --format csv --units mm --side both -o ../out/quote/positions.csv manent.kicad_pcb
+  run kicad-cli pcb export pos --format csv --units mm --side both --exclude-dnp -o ../out/quote/positions.csv manent.kicad_pcb
   cp out/bom.csv out/quote/bom.csv
   cp ../quote/request.md out/quote/README.md
-  cp kicad/manent.kicad_pcb out/quote/
+  cp kicad/manent.kicad_pcb kicad/manent.kicad_pro kicad/manent.kicad_dru out/quote/
   (cd out/quote && rm -f ../../../quote/manent-ring-quote.zip && zip -qr ../../../quote/manent-ring-quote.zip .)
   ;;
 route)

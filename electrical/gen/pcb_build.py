@@ -18,6 +18,7 @@ pt = lambda x, y: pcbnew.VECTOR2I(mm(x), mm(y))
 
 board = pcbnew.BOARD()
 board.SetCopperLayerCount(data["layers"])
+board.GetDesignSettings().SetBoardThickness(pcbnew.FromMM(data["thickness"]))
 nets = {}
 for part in data["parts"]:
     for name in part["nets"].values():
@@ -67,13 +68,14 @@ half = data["width"] / 2
 for z in data["zones"]:
     for x in (z["x0"], z["x1"]):
         line((x, -half), (x, half), pcbnew.Dwgs_User, 0.03)
-    note(f'{z["name"]} ({z["kind"]})' if z["kind"] not in ("bend", "tabs") else z["name"],
-         (z["x0"] + z["x1"]) / 2, -half - 0.6 - (0.7 if z["kind"] == "bend" else 0), pcbnew.Cmts_User, 0.4)
+    # On the drawing layer, which goes to the fabricator with the Gerber files.
+    note("FLEX" if z["kind"] == "bend" else f'RIGID: {z["name"]}',
+         (z["x0"] + z["x1"]) / 2, -half - 0.6 - (0.7 if z["kind"] == "bend" else 0), pcbnew.Dwgs_User, 0.4)
 x0, x1, y = data["tail_cut"]
-line((x0, y), (x1, y), pcbnew.Cmts_User, 0.08)
-note("cut here after test", x1 + 2.6, y + 0.6, pcbnew.Cmts_User, 0.4)
-note("Top copper faces the titanium, bottom copper faces the finger. Tracks not routed.",
-     data["length"] / 2, -half - 2.4, pcbnew.Cmts_User, 0.5)
+line((x0, y), (x1, y), pcbnew.Dwgs_User, 0.08)
+note("cut here after test", x1 + 2.6, y + 0.6, pcbnew.Dwgs_User, 0.4)
+note("Top copper faces the titanium, bottom copper faces the finger.",
+     data["length"] / 2, -half - 2.4, pcbnew.Dwgs_User, 0.5)
 
 out = HERE / "kicad" / "manent.kicad_pcb"
 pcbnew.SaveBoard(str(out), board)

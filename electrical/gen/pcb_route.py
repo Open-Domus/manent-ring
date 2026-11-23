@@ -50,7 +50,10 @@ zone.SetPadConnection(pcbnew.ZONE_CONNECTION_FULL)
 zone.SetIslandRemovalMode(pcbnew.ISLAND_REMOVAL_MODE_ALWAYS)
 outline = zone.Outline()
 outline.NewOutline()
-for x, y in json.loads((HERE / "out" / "board.json").read_text())["outline"]:
+# The strip only: the test tail is cut off, so the plane stays out of it.
+board_json = json.loads((HERE / "out" / "board.json").read_text())
+half = board_json["width"] / 2
+for x, y in ((0, -half), (board_json["length"], -half), (board_json["length"], half), (0, half)):
     outline.Append(mm(x), mm(y))
 board.Add(zone)
 pcbnew.ZONE_FILLER(board).Fill(board.Zones())

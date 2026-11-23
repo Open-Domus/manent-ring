@@ -32,6 +32,7 @@ class Placed:
     turned: bool = False   # True swaps length and width
     ref: str = ""          # reference in the circuit
     fp: str = ""           # footprint name
+    fitted: bool = True    # False: land pattern only, no part on it
 
 
 @dataclass(frozen=True)
@@ -51,7 +52,10 @@ FLEX_T = 0.11          # two-layer flex between islands
 # about 0.015, five dielectrics of about 0.05, solder mask on both faces.
 RIGID_T = 0.45
 SOLDER = 0.05          # stand-off of a soldered part
-BEND = 1.0             # length of each bend zone between islands
+# Length of flex in each gap: after the cell tabs, between neighbouring islands, after the last
+# island. Neighbours sit at different depths in the wall, so each gap needs its own length;
+# checks.bend_report says how much.
+BENDS = (1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
 CELL_TABS = 3.0        # arc taken by the cell tabs and their joint
 CLOSING_GAP = 1.0      # free arc left to close the loop
 SWELL = 0.08           # cell thickness growth to allow for
@@ -59,6 +63,7 @@ CELL_GAP = 0.05        # insulating wrap between the swollen cell and the walls
 BUTTON_DEG = 25.0      # where the button sits: the side of the finger, towards the thumb
 PART_SPACING = 0.15    # between the land patterns of two parts on the same face
 EDGE_MARGIN = 0.15     # from a land pattern to the edge of the board
+END_MARGIN = 0.30      # from a land pattern to the line where an island ends and the flex begins
 # Extra room kept clear around the fine-pitch packages, for their tracks to fan out.
 COURTYARD = {"soc": 0.45, "pmic": 0.3, "flash": 0.3, "mic": 0.2}
 
@@ -66,10 +71,13 @@ COURTYARD = {"soc": 0.45, "pmic": 0.3, "flash": 0.3, "mic": 0.2}
 # Order along the arc, starting at the cell tabs: thumb side -> back of the finger -> far side.
 ISLAND_SPECS = (
     # Charging and service pads face the finger; cell protection sits behind them.
-    ("contacts", RIGID_T, "in", 3.0, None),
+    ("contacts", RIGID_T, "in", 3.4, None),
     ("button", RIGID_T, "out", 2.4, (-15.0, 30.0)),
     ("soc", RIGID_T, "mid", 0.0, None),
     ("audio", RIGID_T, "out", 0.0, (60.0, 120.0)),
+    # The flash has its own island: it keeps the microcontroller island short, which is where
+    # the wall is tightest, and leaves room to route around both chips.
+    ("storage", RIGID_T, "mid", 0.0, None),
     ("power", RIGID_T, "mid", 0.0, None),
     ("antenna", RIGID_T, "mid", 5.0, None),       # kept long: the antenna needs clear board
 )
@@ -90,6 +98,8 @@ def body_of(c) -> str | None:
         return "xtal32m" if "MHz" in c.value else "xtal32k"
     if c.value == "2.2uH":
         return "inductor"
+    if c.sym.name == "L" and c.fields.get("Package") == "0402":
+        return "inductor0402"
     return "passive0402" if c.fields.get("Package") == "0402" else "passive0201"
 
 
@@ -97,22 +107,23 @@ def home_of(c) -> tuple[str, str]:
     """Island and face of a circuit component."""
     nets = set(n for n in c.nets.values() if n)
     if c.sheet == "power":
-        if nets & PROTECTION_NETS or c.sym.name == "TVS":
+        if nets & PROTECTION_NETS or c.sym.name == "TVS" or "NTC" in nets:
             return "contacts", "out"
         big = c.value in ("nPM1304", "2.2uH") or c.fields.get("Package") == "0402"
         return "power", "in" if big else "out"
     if c.sheet == "mcu_rf":
         if "ANT_FEED" in nets or c.value == "tune":
             return "antenna", "in"
-        return "soc", "out" if "kHz" in c.value else "in"
+        radio = nets & {"ANT", "RF_A", "RF_B", "RF_50"}      # the matching network, behind the chip
+        return "soc", "out" if radio or "kHz" in c.value else "in"
     if c.sheet == "storage":
-        return "soc", "out"
+        return "storage", "in"
     if c.sheet == "audio":
         return "audio", "in"
     if c.sym.name == "SW":
         return "button", "out"
-    if c.sym.name == "D":
-        return "button", "in"
+    if nets & {"SWDIO_PAD", "SWDCLK_PAD"}:
+        return "contacts", "out"
     return "audio", "out" if c.sym.name == "LED" else "in"
 
 
@@ -180,7 +191,7 @@ def _clear_of_ports(placed, room):
 def build_islands() -> tuple[Island, ...]:
     parts = load_parts()["parts"]
     homes: dict[tuple[str, str], list] = {}
-    body, fp = {}, {}
+    body, fp, fitted = {}, {}, {}
 
     def room(ref):      # the larger of land pattern and body, plus any fan-out room
         grow = 2 * COURTYARD.get(body[ref], 0.0)
@@ -188,13 +199,13 @@ def build_islands() -> tuple[Island, ...]:
 
     for c in build_circuit():
         if body_of(c):
-            body[c.ref], fp[c.ref] = body_of(c), footprint_of(c)
+            body[c.ref], fp[c.ref], fitted[c.ref] = body_of(c), footprint_of(c), not c.dnp
             homes.setdefault(home_of(c), []).append(c.ref)
     islands = []
     for name, thickness, seat, shortest, target in ISLAND_SPECS:
         faces = {f: pack([(ref, *room(ref)) for ref in homes.pop((name, f), [])]) for f in ("in", "out")}
-        length = max(shortest, max(l for _, l in faces.values()) + 2 * EDGE_MARGIN)
-        placed = [Placed(body[p.part], p.x - l / 2, p.y, f, p.turned, p.part, fp[p.part])
+        length = max(shortest, max(l for _, l in faces.values()) + 2 * END_MARGIN)
+        placed = [Placed(body[p.part], p.x - l / 2, p.y, f, p.turned, p.part, fp[p.part], fitted[p.part])
                   for f, (ps, l) in faces.items() for p in ps]
         placed = tuple(_clear_of_ports(placed, room))
         islands.append(Island(name, math.ceil(length * 100 - 1e-9) / 100, thickness, placed, target, seat))
@@ -203,5 +214,9 @@ def build_islands() -> tuple[Island, ...]:
 
 
 ISLANDS = build_islands()
+
+# US ring sizes offered. Decided on 2026-11-23: below 8 the catalogue cell does not fit the arc
+# left by the electronics.
+SIZES = range(8, 14)
 
 DEFAULT_CELL = {"A": "grp160626", "B": "grp1707_29"}

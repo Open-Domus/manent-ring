@@ -12,8 +12,8 @@ session on a development kit replaces them.
 | PDM interface and 32 MHz oscillator | 1.50 | 1.50 | 1.50 | estimate |
 | Microphone, 120 / 120 / 310 uA at 1.8 V | 0.22 | 0.22 | 0.56 | datasheet |
 | Flash program and erase, averaged | 0.36 | 0.36 | 0.50 | estimate |
-| LED for the wearer, 0.05 / 0.1 / 0.3 mA from the cell | 0.19 | 0.38 | 1.14 | design choice |
-| **At the cell** (3.8 V, 85% conversion) | **1.06 mA** | **1.47 mA** | **2.35 mA** | |
+| LED for the wearer, straight from the cell | 0.05 mA | 0.1 mA | 0.3 mA | design choice |
+| **At the cell** (3.8 V, 85% conversion) | **1.05 mA** | **1.46 mA** | **2.30 mA** | |
 
 ## Hours of recording per charge
 
@@ -21,9 +21,8 @@ Usable capacity is taken as 80% of the rating.
 
 | Cell | Low draw | Nominal | High draw |
 | --- | --- | --- | --- |
-| 21.5 mAh (US 8 and up) | 16.2 h | 11.7 h | 7.3 h |
-| 15.5 mAh (US 7) | 11.7 h | 8.4 h | 5.3 h |
-| 14.5 mAh (US 6) | 11.0 h | 7.9 h | 4.9 h |
+| 15.5 mAh (the cell that fits, US 7 to 13) | 11.8 h | 8.5 h | 5.4 h |
+| 21.5 mAh (if the wider cell can be used) | 16.4 h | 11.8 h | 7.5 h |
 
 ## Days between charges
 
@@ -32,17 +31,21 @@ standby at 15 uA (slow advertising).
 
 | Cell | 15 min/day | 30 min/day | 60 min/day |
 | --- | --- | --- | --- |
-| 21.5 mAh (US 8 and up) | 22 days | 14 days | 8 days |
-| 15.5 mAh (US 7) | 16 days | 10 days | 6 days |
-| 14.5 mAh (US 6) | 15 days | 10 days | 6 days |
+| 15.5 mAh (the cell that fits, US 7 to 13) | 16 days | 10 days | 6 days |
+| 21.5 mAh (if the wider cell can be used) | 22 days | 15 days | 9 days |
 
 ## Standby alone
 
-| State | Current (estimate) | 21.5 mAh cell lasts |
+| State | Current (estimate) | 15.5 mAh cell lasts |
 | --- | --- | --- |
-| slow advertising, 1-2 s interval | 15 uA | 48 days |
-| connected, idle | 20 uA | 36 days |
-| off, button wakes it | 3 uA | 239 days |
+| slow advertising, 1-2 s interval | 15 uA | 34 days |
+| connected, idle | 20 uA | 26 days |
+| off, button wakes it | 3 uA | 172 days |
+
+Not counted: the quiescent current of the power chip and of the cell protector (a few
+microamps together), radio activity while recording, flash reads during upload, and the
+cell's own self-discharge, which over months is of the same order as the standby figures.
+Upload assumes 7.2 MB per recorded hour sent at 400 kbit/s.
 
 ## What to measure first
 

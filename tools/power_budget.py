@@ -5,22 +5,23 @@ from pathlib import Path
 V_CELL = 3.8          # nominal cell voltage
 BUCK_EFF = 0.85       # assumed efficiency of the 1.8 V buck at these loads
 USABLE = 0.80         # share of the rated capacity counted on
-CELLS = {"21.5 mAh (US 8 and up)": 21.5, "15.5 mAh (US 7)": 15.5, "14.5 mAh (US 6)": 14.5}
+# The cell the fit model accepts, and the larger one it rejects by a hair (see space-budget.md).
+CELLS = {"15.5 mAh (the cell that fits, US 7 to 13)": 15.5, "21.5 mAh (if the wider cell can be used)": 21.5}
 
-# (name, low, nominal, high) in milliwatts at the 1.8 V rail unless noted; source
+# (name, low, nominal, high) in milliwatts at the 1.8 V rail; source
 RECORDING = [
     ("CPU, Opus at 15 / 30 / 50 % duty of 2.6 mA at 3 V", 1.15, 2.3, 3.9, "vendor figure x assumed duty"),
     ("PDM interface and 32 MHz oscillator", 1.5, 1.5, 1.5, "estimate"),
     ("Microphone, 120 / 120 / 310 uA at 1.8 V", 0.22, 0.22, 0.56, "datasheet"),
     ("Flash program and erase, averaged", 0.36, 0.36, 0.5, "estimate"),
-    ("LED for the wearer, 0.05 / 0.1 / 0.3 mA from the cell", 0.19, 0.38, 1.14, "design choice"),
 ]
+LED_MA = (0.05, 0.1, 0.3)     # taken straight from the cell, so not through the converter
 UPLOAD_MAH_PER_RECORDED_HOUR = 0.19   # 7.2 MB at an assumed 400 kbit/s
 STANDBY_UA = {"slow advertising, 1-2 s interval": 15, "connected, idle": 20, "off, button wakes it": 3}
 
 
 def recording_ma(col):
-    return sum(r[col] for r in RECORDING) / BUCK_EFF / V_CELL
+    return sum(r[col] for r in RECORDING) / BUCK_EFF / V_CELL + LED_MA[col - 1]
 
 
 def main():
@@ -31,6 +32,7 @@ def main():
            "## Recording", "",
            "| Contributor | Low (mW) | Nominal (mW) | High (mW) | Source |", "| --- | --- | --- | --- | --- |"]
     out += [f"| {n} | {a:.2f} | {b:.2f} | {c:.2f} | {s} |" for n, a, b, c, s in RECORDING]
+    out.append("| LED for the wearer, straight from the cell | " + " | ".join(f"{v} mA" for v in LED_MA) + " | design choice |")
     ma = [recording_ma(i) for i in (1, 2, 3)]
     out += [f"| **At the cell** ({V_CELL} V, {BUCK_EFF:.0%} conversion) | **{ma[0]:.2f} mA** | **{ma[1]:.2f} mA** | **{ma[2]:.2f} mA** | |",
             "", "## Hours of recording per charge", "",
@@ -46,9 +48,13 @@ def main():
     for name, mah in CELLS.items():
         days = [mah * USABLE / (h * (ma[1] + UPLOAD_MAH_PER_RECORDED_HOUR) + idle) for h in (0.25, 0.5, 1.0)]
         out.append(f"| {name} | " + " | ".join(f"{d:.0f} days" for d in days) + " |")
-    out += ["", "## Standby alone", "", "| State | Current (estimate) | 21.5 mAh cell lasts |", "| --- | --- | --- |"]
-    out += [f"| {k} | {v} uA | {21.5 * USABLE / (v * 24 / 1000):.0f} days |" for k, v in STANDBY_UA.items()]
-    out += ["", "## What to measure first", "",
+    out += ["", "## Standby alone", "", "| State | Current (estimate) | 15.5 mAh cell lasts |", "| --- | --- | --- |"]
+    out += [f"| {k} | {v} uA | {15.5 * USABLE / (v * 24 / 1000):.0f} days |" for k, v in STANDBY_UA.items()]
+    out += ["", "Not counted: the quiescent current of the power chip and of the cell protector (a few",
+            "microamps together), radio activity while recording, flash reads during upload, and the",
+            "cell's own self-discharge, which over months is of the same order as the standby figures.",
+            f"Upload assumes 7.2 MB per recorded hour sent at 400 kbit/s.",
+            "", "## What to measure first", "",
             "1. Opus encoder duty cycle on the nRF54L15 at complexity 0: it is the largest term and a guess.",
             "2. PDM and oscillator current while recording.",
             "3. LED current at which the wearer can see it through the resin in daylight.",

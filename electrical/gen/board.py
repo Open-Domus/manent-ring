@@ -15,7 +15,8 @@ from .emit import uid
 from .footprints import LIB_NAME, footprint_of
 
 ROOT = Path(__file__).resolve().parents[2]
-TAIL_W, TAIL_PITCH = 2.0, 1.27
+# Wide enough for the tracks to six pads to pass beside the first one, on a single layer.
+TAIL_W, TAIL_PITCH = 3.4, 1.27
 RULES = {  # millimetres; a rigid-flex build with laser microvias
     # Hole clearance: a 0.1 mm laser hole in a 0.2 mm pad leaves 0.05 of ring; another net's copper
     # at the 0.075 clearance from that pad is 0.125 from the hole.
@@ -33,7 +34,7 @@ NET_CLASS = {"name": "Default", "clearance": 0.075, "track_width": 0.075, "via_d
 # not have; spacing is enforced instead by the packer in the fit model (0.15 mm between land
 # patterns). There is no silkscreen on a potted ring.
 IGNORED = ("courtyards_overlap", "silk_overlap", "silk_over_copper", "silk_edge_clearance", "text_height",
-           "text_thickness", "lib_footprint_mismatch")
+           "text_thickness")
 
 
 def unconnected_nets() -> dict[tuple[str, str], str]:
@@ -50,22 +51,25 @@ def unconnected_nets() -> dict[tuple[str, str], str]:
 def write_project():
     """Board rules live in the project file, next to the board."""
     path = ROOT / "electrical" / "kicad" / "manent.kicad_pro"
-    pro = json.loads(path.read_text()) if path.exists() else {}
-    pro.setdefault("meta", {"filename": "manent.kicad_pro", "version": 3})
-    settings = pro.setdefault("board", {}).setdefault("design_settings", {})
-    settings.setdefault("rules", {}).update(RULES)
-    settings.setdefault("rule_severities", {}).update({k: "ignore" for k in IGNORED})
-    pro.setdefault("net_settings", {})["classes"] = [NET_CLASS]
+    # Written from scratch every time, so that nothing switched off once stays off by accident.
+    pro = {"meta": {"filename": "manent.kicad_pro", "version": 3},
+           "board": {"design_settings": {"rules": RULES, "rule_severities": {k: "ignore" for k in IGNORED}}},
+           "net_settings": {"classes": [NET_CLASS]}}
     path.write_text(json.dumps(pro, indent=2, sort_keys=True) + "\n")
+    # The sound port is a drilled hole, not a laser via: it keeps the full edge clearance.
+    path.with_suffix(".kicad_dru").write_text(
+        '(version 1)\n(rule "drilled hole to copper"\n  (condition "A.Pad_Type == \'NPTH, mechanical\'")\n'
+        f'  (constraint hole_clearance (min {RULES["min_copper_edge_clearance"]}mm)))\n')
 
 
 def layout() -> dict:
     comps = {c.ref: c for c in build() if footprint_of(c)}
     half = S.FLEX_WIDTH / 2
-    x, zones, placed, centre = S.CELL_TABS, [{"name": "cell tabs", "x0": 0.0, "x1": S.CELL_TABS, "kind": "tabs"}], {}, {}
-    for isl in S.ISLANDS:
-        zones.append({"name": "bend", "x0": x, "x1": x + S.BEND, "kind": "bend"})
-        x += S.BEND
+    # The tab area is rigid too: it carries pads and vias.
+    x, zones, placed, centre = S.CELL_TABS, [{"name": "cell tabs", "x0": 0.0, "x1": S.CELL_TABS, "kind": "rigid"}], {}, {}
+    for isl, bend in zip(S.ISLANDS, S.BENDS):
+        zones.append({"name": "bend", "x0": x, "x1": x + bend, "kind": "bend"})
+        x += bend
         centre[isl.name] = x + isl.length / 2
         zones.append({"name": isl.name, "x0": x, "x1": x + isl.length,
                       "kind": "rigid"})
@@ -105,7 +109,7 @@ def layout() -> dict:
                       "path": f"/{sheet[c.sheet]}/{uid(c.sheet, ref)}",
                       "fields": {k: v for k, v in c.fields.items() if k not in ("Footprint", "Datasheet")},
                       "nets": {pin: net or nc[(ref, pin)] for pin, net in c.nets.items()}})
-    return {"lib": LIB_NAME, "layers": LAYERS, "length": length, "width": S.FLEX_WIDTH, "outline": outline, "zones": zones,
+    return {"lib": LIB_NAME, "layers": LAYERS, "thickness": S.RIGID_T, "length": length, "width": S.FLEX_WIDTH, "outline": outline, "zones": zones,
             "tail_cut": [xs - TAIL_W / 2, xs + TAIL_W / 2, half], "rules": RULES, "parts": parts}
 
 

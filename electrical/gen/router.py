@@ -35,6 +35,10 @@ VIA_COST = 30.0       # in grid steps, per layer crossed
 # one layer deeper, so that outer balls never wall in the inner ones.
 PLANE_NET = "GND"
 GRIDS = {"nRF54L15_CSP47": (7, 7), "nPM1304_CSP35": (5, 7)}
+# On these packages a via touching a pad sits on its centre, or not on the pad at all.
+CENTRE_ONLY = set(GRIDS) | {"W25Q128JW_WLCSP21"}
+TRANSITION = 0.30     # no via this close to the line where an island ends and the flex begins
+TAIL_LAYER = 0        # the test tail carries tracks on its pad layer only, and no vias
 
 
 def disc(radius_mm: float) -> list[tuple[int, int]]:
@@ -59,7 +63,8 @@ class Board:
         self.flex = (layers // 2 - 1, layers // 2)
         self.plane = self.flex[0]
         data = json.loads((OUT / "pads.json").read_text())
-        self.zones = json.loads((OUT / "board.json").read_text())["zones"]
+        board = json.loads((OUT / "board.json").read_text())
+        self.zones, cut_y = board["zones"], board["tail_cut"][2]
         pts = [(s[0], s[1]) for s in data["edge"]] + [(s[2], s[3]) for s in data["edge"]]
         self.x0, self.y0 = min(p[0] for p in pts) - 4 * G, min(p[1] for p in pts) - 4 * G
         self.w = int((max(p[0] for p in pts) - self.x0) / G) + 5
@@ -72,17 +77,25 @@ class Board:
         # A little more than the rule: diagonal steps cut inside corners of the outline.
         keep = ~dilate(~inside, disc(EDGE + TRACK / 2 + SLACK + 0.025))
         self.allowed = np.repeat(keep[None], layers, axis=0)
+        self.novia = np.zeros((layers, self.h, self.w), bool)
         for z in self.zones:
             if z["kind"] == "bend":
-                a, b = self.ix(z["x0"]) - 1, self.ix(z["x1"]) + 2
+                a, b = self.ix(z["x0"] - 0.1), self.ix(z["x1"] + 0.1) + 1
                 for l in range(layers):
                     if l not in self.flex:
                         self.allowed[l, :, a:b] = False
+                self.novia[:, :, self.ix(z["x0"] - TRANSITION):self.ix(z["x1"] + TRANSITION) + 1] = True
+        # The tail is cut off after the test: nothing but the stubs to its own pads may be there.
+        self.tail = inside & (self.gy[:, None] > cut_y - G / 2)
+        for l in range(layers):
+            if l != TAIL_LAYER:
+                self.allowed[l][self.tail] = False
+        self.novia[:, self.tail] = True
         self.claim = np.zeros((layers, self.h, self.w), np.int32)
         self.nohole = np.zeros((layers, self.h, self.w), bool)      # no new hole here
         self.nohole_grid = np.zeros((layers, self.h, self.w), bool) # same, for holes in grid-package pads
         self.grid_cells = np.zeros((self.h, self.w), bool)
-        footprint = {p["ref"]: p["footprint"] for p in json.loads((OUT / "board.json").read_text())["parts"]}
+        footprint = {p["ref"]: p["footprint"] for p in board["parts"]}
 
         self.net_id, self.pads = {}, []
         for i, p in enumerate(data["pads"]):
@@ -115,11 +128,19 @@ class Board:
             if grid and len(p["pad"]) == 2:
                 r, c = ord(p["pad"][0]) - 65, int(p["pad"][1]) - 1
                 ring = min(r, c, grid[0] - 1 - r, grid[1] - 1 - c)
-            if grid:
+            centred = footprint.get(p["ref"]) in CENTRE_ONLY
+            if centred:
                 self.grid_cells[cy, cx] = True
+                spot = np.zeros((self.h, self.w), bool)
+                spot[cy, cx] = True
+                near = dilate(spot, disc((max(xs) - min(xs)) / 2 + VIA_PAD / 2 + G))
+                # Outer balls of a ball grid leave on the surface: a via there would wall in the
+                # ring behind it. Every other ball may take a via on its centre.
+                near[cy, cx] = bool(grid) and ring == 0
+                self.novia[layer] |= near
             self.pads.append({"ref": p["ref"], "pad": p["pad"], "net": net, "name": name, "layer": layer,
                               "x": p["x"], "y": p["y"], "cells": cells, "ring": ring, "cy": cy, "cx": cx,
-                              "grid": bool(grid)})
+                              "grid": centred, "tail": p["y"] > cut_y})
         self.names = {v: k for k, v in self.net_id.items()}
 
     def ix(self, x): return int(round((x - self.x0) / G))
@@ -198,6 +219,7 @@ class Router:
         self.near = disc(VIA_PAD / 2)
         self.fan_vias, self.records, self.claimed = [], {}, {}
         self.failed, self.rips, self.seen = {}, {}, {}
+        self.tail_open = False              # True only while a tail pad is being connected
 
     # ---- copper bookkeeping -------------------------------------------------------
     def stamp_via(self, net, y, x, l1, l2):
@@ -253,10 +275,12 @@ class Router:
     def maps(self, net, claim, nohole):
         b = self.b
         ok = b.allowed & ((claim == 0) | (claim == net))
-        free = ~np.where(b.grid_cells[None], nohole[1], nohole[0])
+        if not self.tail_open:
+            ok[:, b.tail] = False
+        free = ~np.where(b.grid_cells[None], nohole[1], nohole[0]) & ~b.novia
         via = np.stack([np.where(b.grid_cells, ~dilate(~ok[l], self.via_fit_grid), ~dilate(~ok[l], self.via_fit))
                         for l in range(b.layers)]) & free
-        plane = ok[b.plane].tobytes()
+        plane = (ok[b.plane] & ~b.tail).tobytes()
         ok[b.plane] = False                 # the plane layer takes vias, not tracks
         return ok.tobytes(), bytearray(via.tobytes()), plane
 
@@ -277,6 +301,7 @@ class Router:
             heap.append((heur(s), 0.0, s))
         heapq.heapify(heap)
         hmax, wmax = b.h - 1, w - 1
+        self.seen = dist                    # kept for diagnosis: what the last search reached
         while heap:
             _, gc, idx = heapq.heappop(heap)
             if gc > dist[idx]:
@@ -397,31 +422,43 @@ class Router:
         ripped = []
         if b.names[net] == PLANE_NET:
             for p in pads:
+                self.tail_open = p["tail"]
                 path, out = self.connect(net, set(p["cells"].tolist()), None,
                                          {"x": p["x"], "y": p["y"], "layer": b.plane}, done="plane")
+                self.tail_open = False
                 ripped += out
                 if path is None:
                     self.failed.setdefault(net, []).append((p["ref"], p["pad"]))
                 elif len(path) > 1:
                     self.commit(net, path)
             return ripped
-        done, todo = [pads[0]], pads[1:]
-        tree = set(pads[0]["cells"].tolist())
-        while todo:
-            target = min(todo, key=lambda p: min((p["x"] - d["x"]) ** 2 + (p["y"] - d["y"]) ** 2 for d in done))
-            goal = {c: p for p in todo for c in p["cells"].tolist()}
-            path, out = self.connect(net, tree, goal, target)
-            ripped += out
-            if path is None:
-                self.failed.setdefault(net, []).append((target["ref"], target["pad"]))
-                todo.remove(target)
-                continue
-            reached = goal[path[-1]]
-            self.commit(net, path)
-            tree.update(path)
-            tree.update(reached["cells"].tolist())
-            done.append(reached)
-            todo.remove(reached)
+        # Pads on the test tail are leaves: the net is routed without them, then each gets a
+        # stub. Nothing else may run through the tail, and no stub may feed another pad.
+        main, leaves = [p for p in pads if not p["tail"]], [p for p in pads if p["tail"]]
+        done, todo = [main[0]], main[1:]
+        tree = set(main[0]["cells"].tolist())
+        tail_cells = set(np.flatnonzero(b.tail).tolist())
+        for stage in (todo, leaves):
+            self.tail_open = stage is leaves
+            while stage:
+                target = min(stage, key=lambda p: min((p["x"] - d["x"]) ** 2 + (p["y"] - d["y"]) ** 2 for d in done))
+                goal = {c: p for p in ([target] if self.tail_open else stage) for c in p["cells"].tolist()}
+                path, out = self.connect(net, tree, goal, target)
+                ripped += out
+                if path is None:
+                    self.failed.setdefault(net, []).append((target["ref"], target["pad"]))
+                    stage.remove(target)
+                    continue
+                reached = goal[path[-1]]
+                self.commit(net, path)
+                if not self.tail_open:
+                    tree.update(path)
+                    tree.update(reached["cells"].tolist())
+                    done.append(reached)
+                else:
+                    tree.update(i for i in path if i % b.hw not in tail_cells)
+                stage.remove(reached)
+        self.tail_open = False
         return ripped
 
     def commit(self, net, path):
@@ -513,7 +550,7 @@ def attempt(layers: int, seed: int) -> dict:
     board = Board(layers)
     for part in json.loads((OUT / "board.json").read_text())["parts"]:
         if part["footprint"] == "EVPBB":       # no copper under the switch body
-            hx, hy = (0.7, 0.95) if part["rot"] else (0.95, 0.7)
+            hx, hy = (0.8, 1.0) if part["rot"] else (1.0, 0.8)   # the body between its lands
             board.block_rect(part["x"], part["y"], hx, hy, 0 if part["side"] == "F" else layers - 1)
     r = Router(board)
     r.fan_out()

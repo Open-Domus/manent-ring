@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 RAILS = {"GND", "V1V8", "VSYS", "VBAT", "VBUS", "VMIC", "VFLASH"}
 CLOCK_NETS = {"PDM_CLK", "SPI_SCK", "I2C_SCL"}
 SAME_PORT = [("PDM_CLK", "PDM_DIN"), ("SPI_SCK", "SPI_SDO", "SPI_SDI", "FLASH_CS"), ("I2C_SCL", "I2C_SDA")]
-WAKE_NETS = {"BTN_WAKE", "MIC_WAKE", "PMIC_INT"}
+WAKE_NETS = {"MIC_WAKE", "PMIC_INT"}
 DECOUPLED = {"U": ("power_in",), "MK": ("power_in",)}
 
 

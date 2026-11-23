@@ -41,3 +41,86 @@ def test_board_is_routed_without_rule_violations():
     assert report["violations"] == []
     assert report["schematic_parity"] == []       # same parts, footprints and nets as the schematic
     assert report["unconnected_items"] == []      # every connection is made
+
+
+# ---- claims about the routing that KiCad's rule check does not cover -----------------
+
+OUT = NETLIST.parent
+
+
+@pytest.fixture(scope="module")
+def routed():
+    import json
+    return json.loads((OUT / "routes.json").read_text()), json.loads((OUT / "board.json").read_text())
+
+
+def _segments(routes):
+    for t in routes["tracks"]:
+        for a, b in zip(t["pts"], t["pts"][1:]):
+            yield t["net"], t["layer"], a, b
+
+
+def test_every_connection_was_routed(routed):
+    assert routed[0]["failed"] == []
+
+
+def test_only_the_two_flex_layers_cross_the_bends_and_no_via_is_near_them(routed):
+    routes, board = routed
+    flex = {routes["layers"] // 2 - 1, routes["layers"] // 2}
+    bends = [(z["x0"], z["x1"]) for z in board["zones"] if z["kind"] == "bend"]
+    assert len(bends) == 6
+    for net, layer, a, b in _segments(routes):
+        lo, hi = sorted((a[0], b[0]))
+        if layer not in flex:
+            assert not any(lo < x1 and hi > x0 for x0, x1 in bends), (net, layer, a, b)
+    for v in routes["vias"]:
+        assert not any(x0 - 0.29 < v["x"] < x1 + 0.29 for x0, x1 in bends), v
+
+
+def test_cutting_the_test_tail_cuts_nothing_else(routed):
+    routes, board = routed
+    cut = board["tail_cut"][2]
+    tail_nets = {"NRESET", "UART_TX", "UART_RX", "V1V8", "GND", "VBAT", "VBUS"}
+    assert not [v for v in routes["vias"] if v["y"] > cut]
+    crossings = {}
+    for net, layer, a, b in _segments(routes):
+        if max(a[1], b[1]) > cut:
+            assert layer == 0, (net, layer)
+        if (a[1] > cut) != (b[1] > cut):
+            crossings[net] = crossings.get(net, 0) + 1
+    # one stub per test pad and nothing else: no net runs through the tail and back
+    assert crossings == {net: 1 for net in tail_nets}
+    assert routes["plane"]["net"] == "GND"
+
+
+def test_nothing_runs_under_the_switch(routed):
+    routes, board = routed
+    sw = next(p for p in board["parts"] if p["footprint"] == "EVPBB")
+    hx, hy = (0.8, 1.0) if sw["rot"] else (1.0, 0.8)
+    layer = 0 if sw["side"] == "F" else routes["layers"] - 1
+    inside = lambda x, y: abs(x - sw["x"]) < hx - 0.05 and abs(y - sw["y"]) < hy - 0.05
+    for net, l, a, b in _segments(routes):
+        if l == layer:
+            assert not inside(*a) and not inside(*b), (net, a, b)
+    for v in routes["vias"]:
+        if v["l1"] <= layer <= v["l2"]:
+            assert not inside(v["x"], v["y"]), v
+
+
+def test_vias_on_grid_packages_sit_on_pad_centres(routed):
+    routes, board = routed
+    from gen.footprints import CUSTOM
+    for part in board["parts"]:
+        fp = CUSTOM.get(part["footprint"])
+        if part["footprint"] not in ("nRF54L15_CSP47", "nPM1304_CSP35", "W25Q128JW_WLCSP21"):
+            continue
+        layer = 0 if part["side"] == "F" else routes["layers"] - 1
+        sx = -1 if part["side"] == "B" else 1            # bottom parts are mirrored left to right
+        for _, _, px, py, d, _ in fp["pads"]:
+            if part["rot"]:
+                px, py = py, -px
+            cx, cy = part["x"] + sx * px, part["y"] + py
+            for v in routes["vias"]:
+                if v["l1"] <= layer <= v["l2"]:
+                    dist = ((v["x"] - cx) ** 2 + (v["y"] - cy) ** 2) ** 0.5
+                    assert dist < 0.005 or dist > d / 2 + 0.1 - 0.005, (part["ref"], v, dist)

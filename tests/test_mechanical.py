@@ -42,10 +42,22 @@ def test_button_and_microphone_land_where_the_hand_needs_them(reports):
     assert not reports["B"]["arc"]["problems"]
 
 
-def test_wide_envelope_takes_the_largest_catalogue_cell_from_size_8_up():
-    rows = {r["us_size"]: r["best_cell"] for r in size_sweep("B")}
-    assert all(rows[s] == "grp1707_29" for s in range(8, 14))
-    assert rows[6] is not None and rows[7] is not None
+def test_every_size_offered_has_a_cell_and_room_for_the_boards():
+    rows = {r["us_size"]: r for r in size_sweep("B")}
+    assert sorted(rows) == list(range(8, 14))
+    assert all(r["best_cell"] for r in rows.values())
+    assert all(r["islands_fit"] for r in rows.values())
+
+
+def test_the_wider_cell_family_does_not_pass_with_swelling(reports):
+    # A finding, not a wish: the 1.7 x 6.5 mm cells miss the swelling allowance by a hair.
+    from manent_mech.checks import cell_report
+    from manent_mech.params import WIDE
+    assert not cell_report(WIDE, S.load_parts(), "grp1707_29")["ok"]
+
+
+def test_the_flex_between_islands_is_long_enough_and_not_folded_too_tight(reports):
+    assert all(b["ok"] for b in reports["B"]["bends"]), reports["B"]["bends"]
 
 
 def test_every_part_of_the_circuit_is_in_the_model():

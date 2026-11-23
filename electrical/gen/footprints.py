@@ -98,7 +98,7 @@ def _text(name: str, fp: dict) -> str:
     if "ring" in fp:        # annular ground pad around the sound port, drawn as a thick circle
         num, x, y, d_in, d_out = fp["ring"]
         r, width = (d_in + d_out) / 4, (d_out - d_in) / 2
-        out.append(f'\t(pad "{num}" smd custom (at {x - r} {y}) (size {width} {width}) (layers "F.Cu" "F.Mask")'
+        out.append(f'\t(pad "{num}" smd custom (at {x - r} {y}) (size {width} {width}) (layers "F.Cu" "F.Mask" "F.Paste")'
                    f' (options (clearance outline) (anchor circle))'
                    f' (primitives (gr_circle (center {r} 0) (end {2 * r} 0) (width {width}) (fill no))))')
     if "hole" in fp:

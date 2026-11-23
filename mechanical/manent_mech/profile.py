@@ -21,34 +21,41 @@ def sdf(p: RingParams, rho: float, y: float) -> float:
     return outside + min(max(dx, dy), 0.0) - p.corner_r
 
 
+def inner_window(p: RingParams) -> float:
+    """Half-width of the inner face that is resin: the flat part between the two fillets.
+    The titanium wraps the corners at full thickness and stops there."""
+    return p.half_width - p.corner_r
+
+
+def in_titanium(p: RingParams, rho: float, y: float) -> bool:
+    d = sdf(p, rho, y)
+    return -p.t_ti < d <= 0 and not (rho < 0 and abs(y) < inner_window(p))
+
+
 def in_cavity(p: RingParams, rho: float, y: float, gap: float | None = None) -> bool:
-    """True if the point may hold a part: behind the titanium (outer face and side
-    walls), above the resin skin (inner face), with `gap` of resin all around."""
+    """True if the point may hold a part: behind the titanium (outer face, side walls and
+    corners), above the resin skin (inner face), with `gap` of resin all around."""
     g = p.gap if gap is None else gap
-    if abs(y) > p.half_width - p.t_ti - g:
-        return False
-    if rho < -half_wall_at(p, y) + p.t_skin + g:
-        return False
-    if rho > 0 and sdf(p, rho, y) > -(p.t_ti + g):
-        return False
-    return True
+    if rho < 0 and abs(y) < inner_window(p):
+        return rho >= -half_wall_at(p, y) + p.t_skin + g
+    return sdf(p, rho, y) <= -(p.t_ti + g)
 
 
 def cavity_limits(p: RingParams, y: float, gap: float = 0.0) -> tuple[float, float] | None:
     """Lowest and highest rho available at axial position y, or None if there is none."""
-    if abs(y) > p.half_width - p.t_ti - gap:
+    if not in_cavity(p, 0.0, y, gap):
         return None
-    lo = -half_wall_at(p, y) + p.t_skin + gap
-    a, b = 0.0, half_wall_at(p, y)          # bisect the outer limit
-    if not in_cavity(p, a, y, gap):
-        return None
-    for _ in range(50):
-        m = (a + b) / 2
-        if in_cavity(p, m, y, gap):
-            a = m
-        else:
-            b = m
-    return (lo, a) if a > lo else None
+    out = []
+    for sign in (-1, 1):
+        a, b = 0.0, sign * (half_wall_at(p, y) + 0.01)
+        for _ in range(50):
+            m = (a + b) / 2
+            if in_cavity(p, m, y, gap):
+                a = m
+            else:
+                b = m
+        out.append(a)
+    return (out[0], out[1]) if out[1] > out[0] else None
 
 
 def cavity_height(p: RingParams, width: float, gap: float = 0.0) -> float:
@@ -78,8 +85,34 @@ def outline(p: RingParams, n: int = 400) -> list[tuple[float, float]]:
 
 def cavity_outline(p: RingParams, gap: float = 0.0, n: int = 120) -> list[tuple[float, float]]:
     """Polygon of the cavity in (rho, y)."""
-    w = p.half_width - p.t_ti - gap
+    w = p.half_width - p.t_ti - gap - 1e-3
     ys = [-w + 2 * w * i / (n - 1) for i in range(n)]
     lim = [(y, cavity_limits(p, y, gap)) for y in ys]
     lim = [(y, v) for y, v in lim if v]
     return [(v[1], y) for y, v in lim] + [(v[0], y) for y, v in reversed(lim)]
+
+
+def shell_outline(p: RingParams, n: int = 240) -> list[tuple[float, float]]:
+    """Polygon of the titanium cross-section in (rho, y): the outline from one lip of the
+    inner window round the outside to the other lip, then back along the inside of the wall."""
+    def along(angle, level):                 # distance from the centre at which sdf == level
+        c, s_ = math.cos(angle), math.sin(angle)
+        lo, hi = 0.0, p.half_width + p.half_wall + p.crown + 1
+        for _ in range(50):
+            m = (lo + hi) / 2
+            if sdf(p, m * c, m * s_) < level:
+                lo = m
+            else:
+                hi = m
+        return lo * c, lo * s_
+    # the lips are where the outline, on the inner side, reaches the window's edge
+    lo, hi = math.pi / 2, math.pi
+    for _ in range(50):
+        m = (lo + hi) / 2
+        if along(m, 0.0)[1] > inner_window(p):
+            lo = m
+        else:
+            hi = m
+    lip = lo
+    angles = [-lip + 2 * lip * i / (n - 1) for i in range(n)]
+    return [along(a, 0.0) for a in angles] + [along(a, -p.t_ti) for a in reversed(angles)]

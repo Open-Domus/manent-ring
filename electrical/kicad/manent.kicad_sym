@@ -43,17 +43,6 @@
 			(pin passive line (at 17.78 -17.78 180) (length 2.54) (name "LED1" (effects (font (size 1.27 1.27)))) (number "A2" (effects (font (size 1.27 1.27)))))
 			(pin passive line (at 17.78 -20.32 180) (length 2.54) (name "LED2" (effects (font (size 1.27 1.27)))) (number "A3" (effects (font (size 1.27 1.27))))))
 		(embedded_fonts no))
-	(symbol "L" (pin_names (offset 0.508) (hide yes)) (exclude_from_sim no) (in_bom yes) (on_board yes)
-		(property "Reference" "L" (at 0 3.81 0) (effects (font (size 1.27 1.27))))
-		(property "Value" "L" (at 0 -3.81 0) (effects (font (size 1.27 1.27))))
-		(property "Footprint" "" (at 0 0.00 0) (effects (font (size 1.27 1.27)) (hide yes)))
-		(property "Datasheet" "" (at 0 0.00 0) (effects (font (size 1.27 1.27)) (hide yes)))
-		(symbol "L_0_1"
-			(rectangle (start -2.54 2.54) (end 2.54 -2.54) (stroke (width 0.254) (type default)) (fill (type background))))
-		(symbol "L_1_1"
-			(pin passive line (at -5.08 0.00 0) (length 2.54) (name "~" (effects (font (size 1.27 1.27)))) (number "1" (effects (font (size 1.27 1.27)))))
-			(pin passive line (at 5.08 0.00 180) (length 2.54) (name "~" (effects (font (size 1.27 1.27)))) (number "2" (effects (font (size 1.27 1.27))))))
-		(embedded_fonts no))
 	(symbol "R" (pin_names (offset 0.508) (hide yes)) (exclude_from_sim no) (in_bom yes) (on_board yes)
 		(property "Reference" "R" (at 0 3.81 0) (effects (font (size 1.27 1.27))))
 		(property "Value" "R" (at 0 -3.81 0) (effects (font (size 1.27 1.27))))
@@ -62,6 +51,17 @@
 		(symbol "R_0_1"
 			(rectangle (start -2.54 2.54) (end 2.54 -2.54) (stroke (width 0.254) (type default)) (fill (type background))))
 		(symbol "R_1_1"
+			(pin passive line (at -5.08 0.00 0) (length 2.54) (name "~" (effects (font (size 1.27 1.27)))) (number "1" (effects (font (size 1.27 1.27)))))
+			(pin passive line (at 5.08 0.00 180) (length 2.54) (name "~" (effects (font (size 1.27 1.27)))) (number "2" (effects (font (size 1.27 1.27))))))
+		(embedded_fonts no))
+	(symbol "L" (pin_names (offset 0.508) (hide yes)) (exclude_from_sim no) (in_bom yes) (on_board yes)
+		(property "Reference" "L" (at 0 3.81 0) (effects (font (size 1.27 1.27))))
+		(property "Value" "L" (at 0 -3.81 0) (effects (font (size 1.27 1.27))))
+		(property "Footprint" "" (at 0 0.00 0) (effects (font (size 1.27 1.27)) (hide yes)))
+		(property "Datasheet" "" (at 0 0.00 0) (effects (font (size 1.27 1.27)) (hide yes)))
+		(symbol "L_0_1"
+			(rectangle (start -2.54 2.54) (end 2.54 -2.54) (stroke (width 0.254) (type default)) (fill (type background))))
+		(symbol "L_1_1"
 			(pin passive line (at -5.08 0.00 0) (length 2.54) (name "~" (effects (font (size 1.27 1.27)))) (number "1" (effects (font (size 1.27 1.27)))))
 			(pin passive line (at 5.08 0.00 180) (length 2.54) (name "~" (effects (font (size 1.27 1.27)))) (number "2" (effects (font (size 1.27 1.27))))))
 		(embedded_fonts no))
@@ -287,17 +287,6 @@
 		(symbol "SW_0_1"
 			(rectangle (start -2.54 2.54) (end 2.54 -2.54) (stroke (width 0.254) (type default)) (fill (type background))))
 		(symbol "SW_1_1"
-			(pin passive line (at -5.08 0.00 0) (length 2.54) (name "~" (effects (font (size 1.27 1.27)))) (number "1" (effects (font (size 1.27 1.27)))))
-			(pin passive line (at 5.08 0.00 180) (length 2.54) (name "~" (effects (font (size 1.27 1.27)))) (number "2" (effects (font (size 1.27 1.27))))))
-		(embedded_fonts no))
-	(symbol "D" (pin_names (offset 0.508) (hide yes)) (exclude_from_sim no) (in_bom yes) (on_board yes)
-		(property "Reference" "D" (at 0 3.81 0) (effects (font (size 1.27 1.27))))
-		(property "Value" "D" (at 0 -3.81 0) (effects (font (size 1.27 1.27))))
-		(property "Footprint" "" (at 0 0.00 0) (effects (font (size 1.27 1.27)) (hide yes)))
-		(property "Datasheet" "" (at 0 0.00 0) (effects (font (size 1.27 1.27)) (hide yes)))
-		(symbol "D_0_1"
-			(rectangle (start -2.54 2.54) (end 2.54 -2.54) (stroke (width 0.254) (type default)) (fill (type background))))
-		(symbol "D_1_1"
 			(pin passive line (at -5.08 0.00 0) (length 2.54) (name "~" (effects (font (size 1.27 1.27)))) (number "1" (effects (font (size 1.27 1.27)))))
 			(pin passive line (at 5.08 0.00 180) (length 2.54) (name "~" (effects (font (size 1.27 1.27)))) (number "2" (effects (font (size 1.27 1.27))))))
 		(embedded_fonts no))

@@ -12,15 +12,15 @@
         "4.0": 2.05,
         "5.0": 1.95,
         "5.6": 1.89,
-        "6.0": 1.8,
-        "6.5": 1.5
+        "6.0": 1.71,
+        "6.5": 1.16
       },
       "islands": [
         {
           "island": "contacts",
-          "length": 3.0,
+          "length": 5.53,
           "stack_height": 1.0,
-          "clearance": 0.684,
+          "clearance": 0.619,
           "plane_radius": 9.89,
           "ok": true,
           "problems": []
@@ -28,36 +28,45 @@
         {
           "island": "button",
           "length": 2.4,
-          "stack_height": 1.4,
-          "clearance": 0.372,
-          "plane_radius": 10.69,
+          "stack_height": 1.03,
+          "clearance": 0.765,
+          "plane_radius": 10.71,
           "ok": true,
           "problems": []
         },
         {
           "island": "soc",
-          "length": 6.35,
-          "stack_height": 1.7,
-          "clearance": 0.053,
-          "plane_radius": 10.435,
-          "ok": false,
+          "length": 4.3,
+          "stack_height": 1.67,
+          "clearance": 0.16,
+          "plane_radius": 10.64,
+          "ok": true,
           "problems": []
         },
         {
           "island": "audio",
-          "length": 4.2,
+          "length": 4.5,
           "stack_height": 1.73,
           "clearance": 0.181,
-          "plane_radius": 11.07,
+          "plane_radius": 11.04,
+          "ok": true,
+          "problems": []
+        },
+        {
+          "island": "storage",
+          "length": 4.75,
+          "stack_height": 0.96,
+          "clearance": 0.675,
+          "plane_radius": 10.71,
           "ok": true,
           "problems": []
         },
         {
           "island": "power",
-          "length": 4.82,
+          "length": 2.89,
           "stack_height": 1.65,
-          "clearance": 0.17,
-          "plane_radius": 10.828,
+          "clearance": 0.185,
+          "plane_radius": 10.815,
           "ok": true,
           "problems": []
         },
@@ -81,20 +90,20 @@
           1.6
         ],
         "status": "verified",
-        "clearance": 0.032,
-        "radius": 10.555,
-        "arc_deg": 141.1,
+        "clearance": -0.009,
+        "radius": 10.6,
+        "arc_deg": 140.5,
         "ok": false
       },
       "arc": {
-        "electronics_mm": 35.77,
-        "cell_arc_deg": 141.1,
-        "cell_centre_deg": -95.3,
-        "slack_mm": 3.73,
+        "electronics_mm": 38.59,
+        "cell_arc_deg": 140.5,
+        "cell_centre_deg": -108.2,
+        "slack_mm": 1.02,
         "placed": [
           {
             "island": "contacts",
-            "centre_deg": 5.0
+            "centre_deg": -0.7
           },
           {
             "island": "button",
@@ -102,33 +111,82 @@
           },
           {
             "island": "soc",
-            "centre_deg": 54.1
+            "centre_deg": 47.3
           },
           {
             "island": "audio",
-            "centre_deg": 88.0
+            "centre_deg": 74.1
+          },
+          {
+            "island": "storage",
+            "centre_deg": 102.2
           },
           {
             "island": "power",
-            "centre_deg": 117.8
+            "centre_deg": 126.8
           },
           {
             "island": "antenna",
-            "centre_deg": 149.7
+            "centre_deg": 152.0
           }
         ],
         "ok": true,
         "problems": []
       },
-      "flex": {
-        "bend_radius_over_thickness": 87.0,
-        "minimum": 10,
-        "ok": true
-      },
+      "bends": [
+        {
+          "between": "contacts - button",
+          "flex": 1.0,
+          "depth_step": 0.82,
+          "fold_radius": 2.23,
+          "radius_over_thickness": 20,
+          "ok": true
+        },
+        {
+          "between": "button - soc",
+          "flex": 1.0,
+          "depth_step": 0.07,
+          "fold_radius": 2.57,
+          "radius_over_thickness": 23,
+          "ok": true
+        },
+        {
+          "between": "soc - audio",
+          "flex": 1.0,
+          "depth_step": 0.4,
+          "fold_radius": 2.14,
+          "radius_over_thickness": 19,
+          "ok": true
+        },
+        {
+          "between": "audio - storage",
+          "flex": 1.0,
+          "depth_step": 0.33,
+          "fold_radius": 2.04,
+          "radius_over_thickness": 19,
+          "ok": true
+        },
+        {
+          "between": "storage - power",
+          "flex": 1.0,
+          "depth_step": 0.1,
+          "fold_radius": 2.33,
+          "radius_over_thickness": 21,
+          "ok": true
+        },
+        {
+          "between": "power - antenna",
+          "flex": 1.0,
+          "depth_step": 0.14,
+          "fold_radius": 2.27,
+          "radius_over_thickness": 21,
+          "ok": true
+        }
+      ],
       "mass": {
-        "titanium_g": 1.29,
-        "filling_g_estimate": 1.65,
-        "total_g_estimate": 2.94
+        "titanium_g": 1.41,
+        "filling_g_estimate": 1.6,
+        "total_g_estimate": 3.02
       },
       "ok": false
     },
@@ -145,14 +203,14 @@
         "5.0": 2.09,
         "5.6": 2.05,
         "6.0": 2.02,
-        "6.5": 1.96
+        "6.5": 1.89
       },
       "islands": [
         {
           "island": "contacts",
-          "length": 3.0,
+          "length": 5.53,
           "stack_height": 1.0,
-          "clearance": 0.751,
+          "clearance": 0.687,
           "plane_radius": 9.825,
           "ok": true,
           "problems": []
@@ -160,24 +218,24 @@
         {
           "island": "button",
           "length": 2.4,
-          "stack_height": 1.4,
-          "clearance": 0.399,
-          "plane_radius": 10.745,
+          "stack_height": 1.03,
+          "clearance": 0.799,
+          "plane_radius": 10.765,
           "ok": true,
           "problems": []
         },
         {
           "island": "soc",
-          "length": 6.35,
-          "stack_height": 1.7,
-          "clearance": 0.102,
-          "plane_radius": 10.445,
+          "length": 4.3,
+          "stack_height": 1.67,
+          "clearance": 0.22,
+          "plane_radius": 10.66,
           "ok": true,
           "problems": []
         },
         {
           "island": "audio",
-          "length": 4.2,
+          "length": 4.5,
           "stack_height": 1.73,
           "clearance": 0.223,
           "plane_radius": 11.13,
@@ -185,11 +243,20 @@
           "problems": []
         },
         {
+          "island": "storage",
+          "length": 4.75,
+          "stack_height": 0.96,
+          "clearance": 0.735,
+          "plane_radius": 10.742,
+          "ok": true,
+          "problems": []
+        },
+        {
           "island": "power",
-          "length": 4.82,
+          "length": 2.89,
           "stack_height": 1.65,
-          "clearance": 0.233,
-          "plane_radius": 10.845,
+          "clearance": 0.239,
+          "plane_radius": 10.837,
           "ok": true,
           "problems": []
         },
@@ -204,29 +271,29 @@
         }
       ],
       "cell": {
-        "cell": "grp1707_29",
-        "mpn": "GRP1707xx, 29 mm (exact code to confirm)",
-        "capacity_mah": 21.5,
+        "cell": "grp160626",
+        "mpn": "GRP160626",
+        "capacity_mah": 15.5,
         "size": [
-          29.0,
-          6.5,
-          1.7
+          26.0,
+          6.0,
+          1.6
         ],
-        "status": "secondary",
-        "clearance": 0.06,
-        "radius": 10.582,
-        "arc_deg": 157.0,
+        "status": "verified",
+        "clearance": 0.148,
+        "radius": 10.595,
+        "arc_deg": 140.6,
         "ok": true
       },
       "arc": {
-        "electronics_mm": 35.77,
-        "cell_arc_deg": 157.0,
-        "cell_centre_deg": -103.1,
-        "slack_mm": 0.86,
+        "electronics_mm": 38.42,
+        "cell_arc_deg": 140.6,
+        "cell_centre_deg": -107.8,
+        "slack_mm": 1.25,
         "placed": [
           {
             "island": "contacts",
-            "centre_deg": 5.0
+            "centre_deg": -0.2
           },
           {
             "island": "button",
@@ -234,33 +301,82 @@
           },
           {
             "island": "soc",
-            "centre_deg": 54.0
+            "centre_deg": 47.2
           },
           {
             "island": "audio",
-            "centre_deg": 87.9
+            "centre_deg": 73.7
+          },
+          {
+            "island": "storage",
+            "centre_deg": 101.6
           },
           {
             "island": "power",
-            "centre_deg": 117.6
+            "centre_deg": 126.0
           },
           {
             "island": "antenna",
-            "centre_deg": 149.5
+            "centre_deg": 151.2
           }
         ],
         "ok": true,
         "problems": []
       },
-      "flex": {
-        "bend_radius_over_thickness": 87.0,
-        "minimum": 10,
-        "ok": true
-      },
+      "bends": [
+        {
+          "between": "contacts - button",
+          "flex": 1.0,
+          "depth_step": 0.94,
+          "fold_radius": 2.27,
+          "radius_over_thickness": 21,
+          "ok": true
+        },
+        {
+          "between": "button - soc",
+          "flex": 1.0,
+          "depth_step": 0.11,
+          "fold_radius": 2.58,
+          "radius_over_thickness": 23,
+          "ok": true
+        },
+        {
+          "between": "soc - audio",
+          "flex": 1.0,
+          "depth_step": 0.47,
+          "fold_radius": 2.17,
+          "radius_over_thickness": 20,
+          "ok": true
+        },
+        {
+          "between": "audio - storage",
+          "flex": 1.0,
+          "depth_step": 0.39,
+          "fold_radius": 2.06,
+          "radius_over_thickness": 19,
+          "ok": true
+        },
+        {
+          "between": "storage - power",
+          "flex": 1.0,
+          "depth_step": 0.09,
+          "fold_radius": 2.34,
+          "radius_over_thickness": 21,
+          "ok": true
+        },
+        {
+          "between": "power - antenna",
+          "flex": 1.0,
+          "depth_step": 0.13,
+          "fold_radius": 2.28,
+          "radius_over_thickness": 21,
+          "ok": true
+        }
+      ],
       "mass": {
-        "titanium_g": 1.42,
-        "filling_g_estimate": 1.86,
-        "total_g_estimate": 3.28
+        "titanium_g": 1.54,
+        "filling_g_estimate": 1.82,
+        "total_g_estimate": 3.36
       },
       "ok": true
     }
@@ -268,119 +384,220 @@
   "size_sweep": {
     "A": [
       {
-        "us_size": 6,
-        "inner_diameter": 16.51,
-        "max_cell_length": 24.3,
-        "best_cell": null,
-        "capacity_mah": null
-      },
-      {
         "us_size": 7,
         "inner_diameter": 17.32,
-        "max_cell_length": 26.8,
+        "islands_fit": true,
+        "tightest_island": 0.158,
+        "max_cell_length": 24.1,
         "best_cell": null,
         "capacity_mah": null
       },
       {
         "us_size": 8,
         "inner_diameter": 18.13,
-        "max_cell_length": 29.4,
+        "islands_fit": true,
+        "tightest_island": 0.16,
+        "max_cell_length": 26.7,
         "best_cell": null,
         "capacity_mah": null
       },
       {
         "us_size": 9,
         "inner_diameter": 18.95,
-        "max_cell_length": 31.9,
+        "islands_fit": true,
+        "tightest_island": 0.159,
+        "max_cell_length": 29.2,
         "best_cell": null,
         "capacity_mah": null
       },
       {
         "us_size": 10,
         "inner_diameter": 19.76,
-        "max_cell_length": 34.5,
+        "islands_fit": true,
+        "tightest_island": 0.163,
+        "max_cell_length": 31.8,
         "best_cell": null,
         "capacity_mah": null
       },
       {
         "us_size": 11,
         "inner_diameter": 20.57,
-        "max_cell_length": 37.0,
+        "islands_fit": true,
+        "tightest_island": 0.163,
+        "max_cell_length": 34.3,
         "best_cell": null,
         "capacity_mah": null
       },
       {
         "us_size": 12,
         "inner_diameter": 21.38,
-        "max_cell_length": 39.6,
+        "islands_fit": true,
+        "tightest_island": 0.163,
+        "max_cell_length": 36.8,
         "best_cell": null,
         "capacity_mah": null
       },
       {
         "us_size": 13,
         "inner_diameter": 22.2,
-        "max_cell_length": 42.1,
+        "islands_fit": true,
+        "tightest_island": 0.165,
+        "max_cell_length": 39.4,
         "best_cell": null,
         "capacity_mah": null
       }
     ],
     "B": [
       {
-        "us_size": 6,
-        "inner_diameter": 16.51,
-        "max_cell_length": 24.4,
-        "best_cell": "grp1707_22",
-        "capacity_mah": 14.5
-      },
-      {
         "us_size": 7,
         "inner_diameter": 17.32,
+        "islands_fit": true,
+        "tightest_island": 0.216,
+        "max_cell_length": 24.4,
+        "best_cell": null,
+        "capacity_mah": null
+      },
+      {
+        "us_size": 8,
+        "inner_diameter": 18.13,
+        "islands_fit": true,
+        "tightest_island": 0.219,
         "max_cell_length": 27.0,
         "best_cell": "grp160626",
         "capacity_mah": 15.5
       },
       {
-        "us_size": 8,
-        "inner_diameter": 18.13,
-        "max_cell_length": 29.5,
-        "best_cell": "grp1707_29",
-        "capacity_mah": 21.5
-      },
-      {
         "us_size": 9,
         "inner_diameter": 18.95,
-        "max_cell_length": 32.1,
-        "best_cell": "grp1707_29",
-        "capacity_mah": 21.5
+        "islands_fit": true,
+        "tightest_island": 0.219,
+        "max_cell_length": 29.5,
+        "best_cell": "grp160626",
+        "capacity_mah": 15.5
       },
       {
         "us_size": 10,
         "inner_diameter": 19.76,
-        "max_cell_length": 34.6,
-        "best_cell": "grp1707_29",
-        "capacity_mah": 21.5
+        "islands_fit": true,
+        "tightest_island": 0.22,
+        "max_cell_length": 32.0,
+        "best_cell": "grp160626",
+        "capacity_mah": 15.5
       },
       {
         "us_size": 11,
         "inner_diameter": 20.57,
-        "max_cell_length": 37.2,
-        "best_cell": "grp1707_29",
-        "capacity_mah": 21.5
+        "islands_fit": true,
+        "tightest_island": 0.223,
+        "max_cell_length": 34.6,
+        "best_cell": "grp160626",
+        "capacity_mah": 15.5
       },
       {
         "us_size": 12,
         "inner_diameter": 21.38,
-        "max_cell_length": 39.7,
-        "best_cell": "grp1707_29",
-        "capacity_mah": 21.5
+        "islands_fit": true,
+        "tightest_island": 0.222,
+        "max_cell_length": 37.1,
+        "best_cell": "grp160626",
+        "capacity_mah": 15.5
       },
       {
         "us_size": 13,
         "inner_diameter": 22.2,
-        "max_cell_length": 42.3,
-        "best_cell": "grp1707_29",
-        "capacity_mah": 21.5
+        "islands_fit": true,
+        "tightest_island": 0.222,
+        "max_cell_length": 39.7,
+        "best_cell": "grp160626",
+        "capacity_mah": 15.5
       }
     ]
-  }
+  },
+  "sensitivity": [
+    {
+      "what": "island thickness 0.40",
+      "margin": 0.145,
+      "ok": true
+    },
+    {
+      "what": "island thickness 0.45",
+      "margin": 0.12,
+      "ok": true
+    },
+    {
+      "what": "island thickness 0.50",
+      "margin": 0.095,
+      "ok": true
+    },
+    {
+      "what": "island thickness 0.55",
+      "margin": 0.07,
+      "ok": true
+    },
+    {
+      "what": "island thickness 0.60",
+      "margin": 0.045,
+      "ok": true
+    },
+    {
+      "what": "GRP160626 (1.6 x 6.0) swollen 0%",
+      "margin": 0.162,
+      "ok": true
+    },
+    {
+      "what": "GRP170722 (1.7 x 6.5) swollen 0%",
+      "margin": 0.04,
+      "ok": true
+    },
+    {
+      "what": "GRP170729 (1.7 x 6.5) swollen 0%",
+      "margin": 0.04,
+      "ok": true
+    },
+    {
+      "what": "GRP160626 (1.6 x 6.0) swollen 5%",
+      "margin": 0.122,
+      "ok": true
+    },
+    {
+      "what": "GRP170722 (1.7 x 6.5) swollen 5%",
+      "margin": 0.0,
+      "ok": true
+    },
+    {
+      "what": "GRP170729 (1.7 x 6.5) swollen 5%",
+      "margin": 0.0,
+      "ok": true
+    },
+    {
+      "what": "GRP160626 (1.6 x 6.0) swollen 8%",
+      "margin": 0.098,
+      "ok": true
+    },
+    {
+      "what": "GRP170722 (1.7 x 6.5) swollen 8%",
+      "margin": -0.024,
+      "ok": false
+    },
+    {
+      "what": "GRP170729 (1.7 x 6.5) swollen 8%",
+      "margin": -0.024,
+      "ok": false
+    },
+    {
+      "what": "GRP160626 (1.6 x 6.0) swollen 10%",
+      "margin": 0.082,
+      "ok": true
+    },
+    {
+      "what": "GRP170722 (1.7 x 6.5) swollen 10%",
+      "margin": -0.041,
+      "ok": false
+    },
+    {
+      "what": "GRP170729 (1.7 x 6.5) swollen 10%",
+      "margin": -0.041,
+      "ok": false
+    }
+  ]
 }

@@ -15,3 +15,4 @@ electrical/out/pads.json
 electrical/out/quote/
 quote/*.zip
 mechanical/out/*.stl
+view.html
