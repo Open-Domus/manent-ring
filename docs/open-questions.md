@@ -4,7 +4,8 @@
 
 | Question | Why it matters | Current assumption |
 | --- | --- | --- |
-| Which ring sizes to offer | Below US 7 nothing fits; capacity grows with size | US 7 to 13 |
+| Is a six-layer any-layer build acceptable in cost? | The routing needs stacked microvias and vias in pads; a simpler build means more layers of thought, or a bigger board | six layers |
+| Which ring sizes to offer | The 21.5 mAh cell fits from US 8; US 6 and 7 get 14.5 and 15.5 mAh | US 6 to 13 |
 | Is "about 0.1 mA, wearer only" bright enough outdoors? | It sets a fifth of the recording budget if raised to 0.3 mA | 0.1 mA |
 | Licence for the scripts | Not covered by the hardware or document licences | undecided |
 
@@ -37,5 +38,5 @@
 
 ## Not designed yet
 
-Board routing and layer stack (parts are placed, no track is drawn), the dock, the button cap, the antenna, firmware changes (pins, power chip
+A board layout fit for fabrication (the routing in the repository proves connectivity only: see the Board section of design.md), the dock, the button cap, the antenna, firmware changes (pins, power chip
 driver, light, gestures), compliance (radio, potted lithium cell).

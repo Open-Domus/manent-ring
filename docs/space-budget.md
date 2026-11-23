@@ -25,15 +25,15 @@ Cavity height available to a centred part, by part width: 4.0 wide: 2.05, 5.0 wi
 
 | Island | Length | Stack height | Resin left around it | Centre at | Result |
 | --- | --- | --- | --- | --- | --- |
-| contacts | 3.0 | 0.75 | 0.68 | 5 deg | fits |
-| button | 2.4 | 1.15 | 0.50 | 25 deg | fits |
-| soc | 5.57 | 1.65 | 0.07 | 52 deg | FAILS  |
-| audio | 4.2 | 1.48 | 0.31 | 84 deg | fits |
-| power | 4.82 | 1.60 | 0.20 | 114 deg | fits |
-| antenna | 5.0 | 0.65 | 0.76 | 146 deg | fits |
+| contacts | 3.0 | 1.00 | 0.68 | 5 deg | fits |
+| button | 2.4 | 1.40 | 0.37 | 25 deg | fits |
+| soc | 6.35 | 1.70 | 0.05 | 54 deg | FAILS  |
+| audio | 4.2 | 1.73 | 0.18 | 88 deg | fits |
+| power | 4.82 | 1.65 | 0.17 | 118 deg | fits |
+| antenna | 5.0 | 0.90 | 0.73 | 150 deg | fits |
 
 - **Cell**: GRP160626, 26.0 x 6.0 x 1.6, 15.5 mAh. Room left on each side after swelling: 0.03 (less than the 0.05 required). It spans 141.1 degrees.
-- **Arc**: electronics take 34.99 of arc; +4.5 is left over.
+- **Arc**: electronics take 35.77 of arc; +3.7 is left over.
 - **Mass** (estimate): titanium 1.29 g, total about 2.94 g.
 - Drawings: [plan](../mechanical/out/plan-A.svg), [audio island section](../mechanical/out/section-A-audio.svg), [SoC island section](../mechanical/out/section-A-soc.svg).
 
@@ -46,15 +46,15 @@ Cavity height available to a centred part, by part width: 4.0 wide: 2.15, 5.0 wi
 
 | Island | Length | Stack height | Resin left around it | Centre at | Result |
 | --- | --- | --- | --- | --- | --- |
-| contacts | 3.0 | 0.75 | 0.75 | 5 deg | fits |
-| button | 2.4 | 1.15 | 0.52 | 25 deg | fits |
-| soc | 5.57 | 1.65 | 0.12 | 52 deg | fits |
-| audio | 4.2 | 1.48 | 0.35 | 84 deg | fits |
-| power | 4.82 | 1.60 | 0.26 | 113 deg | fits |
-| antenna | 5.0 | 0.65 | 0.83 | 145 deg | fits |
+| contacts | 3.0 | 1.00 | 0.75 | 5 deg | fits |
+| button | 2.4 | 1.40 | 0.40 | 25 deg | fits |
+| soc | 6.35 | 1.70 | 0.10 | 54 deg | fits |
+| audio | 4.2 | 1.73 | 0.22 | 88 deg | fits |
+| power | 4.82 | 1.65 | 0.23 | 118 deg | fits |
+| antenna | 5.0 | 0.90 | 0.83 | 150 deg | fits |
 
 - **Cell**: GRP1707xx, 29 mm (exact code to confirm), 29.0 x 6.5 x 1.7, 21.5 mAh. Room left on each side after swelling: 0.06 (enough). It spans 157.0 degrees.
-- **Arc**: electronics take 34.99 of arc; +1.6 is left over.
+- **Arc**: electronics take 35.77 of arc; +0.9 is left over.
 - **Mass** (estimate): titanium 1.42 g, total about 3.28 g.
 - Drawings: [plan](../mechanical/out/plan-B.svg), [audio island section](../mechanical/out/section-B-audio.svg), [SoC island section](../mechanical/out/section-B-soc.svg).
 
@@ -64,14 +64,14 @@ The electronics need the same arc on every finger, so the cell gets what is left
 
 | US size | Inner diameter | Longest cell | Best catalogue cell, 7.4 band | Best catalogue cell, 8.0 band |
 | --- | --- | --- | --- | --- |
-| 6 | 16.51 | 25.2 | none | grp1707_22 (14.5 mAh) |
-| 7 | 17.32 | 27.7 | none | grp160626 (15.5 mAh) |
-| 8 | 18.13 | 30.3 | none | grp1707_29 (21.5 mAh) |
-| 9 | 18.95 | 32.8 | none | grp1707_29 (21.5 mAh) |
-| 10 | 19.76 | 35.4 | none | grp1707_29 (21.5 mAh) |
-| 11 | 20.57 | 37.9 | none | grp1707_29 (21.5 mAh) |
-| 12 | 21.38 | 40.5 | none | grp1707_29 (21.5 mAh) |
-| 13 | 22.2 | 43.0 | none | grp1707_29 (21.5 mAh) |
+| 6 | 16.51 | 24.4 | none | grp1707_22 (14.5 mAh) |
+| 7 | 17.32 | 27.0 | none | grp160626 (15.5 mAh) |
+| 8 | 18.13 | 29.5 | none | grp1707_29 (21.5 mAh) |
+| 9 | 18.95 | 32.1 | none | grp1707_29 (21.5 mAh) |
+| 10 | 19.76 | 34.6 | none | grp1707_29 (21.5 mAh) |
+| 11 | 20.57 | 37.2 | none | grp1707_29 (21.5 mAh) |
+| 12 | 21.38 | 39.7 | none | grp1707_29 (21.5 mAh) |
+| 13 | 22.2 | 42.3 | none | grp1707_29 (21.5 mAh) |
 
 The largest cell in the catalogue family is 29 long. Where the table shows room for a longer one,
 more capacity needs a cell made to order: roughly 0.74 mAh per millimetre, by proportion.

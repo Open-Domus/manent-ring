@@ -11,3 +11,4 @@ electrical/out/erc.json
 electrical/out/netlist.xml
 electrical/out/drc.json
 electrical/out/board.json
+electrical/out/pads.json

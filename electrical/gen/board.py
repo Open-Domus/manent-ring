@@ -17,11 +17,14 @@ from .footprints import LIB_NAME, footprint_of
 ROOT = Path(__file__).resolve().parents[2]
 TAIL_W, TAIL_PITCH = 2.0, 1.27
 RULES = {  # millimetres; a rigid-flex build with laser microvias
+    # Hole clearance: a 0.1 mm laser hole in a 0.2 mm pad leaves 0.05 of ring; another net's copper
+    # at the 0.075 clearance from that pad is 0.125 from the hole.
     "min_clearance": 0.075, "min_track_width": 0.075, "min_copper_edge_clearance": 0.15,
-    "min_hole_clearance": 0.15, "min_hole_to_hole": 0.2, "min_through_hole_diameter": 0.1,
+    "min_hole_clearance": 0.125, "min_hole_to_hole": 0.2, "min_through_hole_diameter": 0.1,
     "min_via_diameter": 0.2, "min_via_annular_width": 0.05, "min_microvia_diameter": 0.2,
-    "min_microvia_drill": 0.1,
+    "min_microvia_drill": 0.1, "allow_blind_buried_vias": True, "allow_microvias": True,
 }
+LAYERS = 6            # copper layers on the rigid islands; the two in the middle are the flex
 NET_CLASS = {"name": "Default", "clearance": 0.075, "track_width": 0.075, "via_diameter": 0.25, "via_drill": 0.1,
              "microvia_diameter": 0.2, "microvia_drill": 0.1, "diff_pair_width": 0.075, "diff_pair_gap": 0.075,
              "diff_pair_via_gap": 0.1, "wire_width": 6, "bus_width": 12, "line_style": 0,
@@ -65,7 +68,7 @@ def layout() -> dict:
         x += S.BEND
         centre[isl.name] = x + isl.length / 2
         zones.append({"name": isl.name, "x0": x, "x1": x + isl.length,
-                      "kind": "rigid" if isl.thickness >= S.RIGID_T else "stiffened"})
+                      "kind": "rigid"})
         for pl in isl.parts:
             placed[pl.ref] = (centre[isl.name] + pl.x, pl.y, "F" if pl.face == "out" else "B", 90 if pl.turned else 0)
         x += isl.length
@@ -102,7 +105,7 @@ def layout() -> dict:
                       "path": f"/{sheet[c.sheet]}/{uid(c.sheet, ref)}",
                       "fields": {k: v for k, v in c.fields.items() if k not in ("Footprint", "Datasheet")},
                       "nets": {pin: net or nc[(ref, pin)] for pin, net in c.nets.items()}})
-    return {"lib": LIB_NAME, "length": length, "width": S.FLEX_WIDTH, "outline": outline, "zones": zones,
+    return {"lib": LIB_NAME, "layers": LAYERS, "length": length, "width": S.FLEX_WIDTH, "outline": outline, "zones": zones,
             "tail_cut": [xs - TAIL_W / 2, xs + TAIL_W / 2, half], "rules": RULES, "parts": parts}
 
 

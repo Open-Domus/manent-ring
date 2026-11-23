@@ -127,8 +127,8 @@ The full list with part numbers is `electrical/out/bom.csv`.
   0.375 mm port), one small hole or thinned window for the light, one for the button.
 - Layout: six islands, parts on both faces. Flash sits behind the microcontroller, the small
   power parts behind the power chip, the cell protection behind the charging pads. This
-  keeps the electronics to about 35 mm of arc and leaves the rest to the cell.
-- Circuit: rigid islands for the fine-pitch chips joined by two-layer flex. The 0.3 mm
+  keeps the electronics to about 36 mm of arc and leaves the rest to the cell.
+- Circuit: six rigid islands joined by two-layer flex. The 0.3 mm
   pitch of the microcontroller package needs microvias under the chip; Nordic's own
   reference board is an eight-layer build. This is work for a specialist fabricator and
   an assembler with X-ray inspection. "Assembled by hand" can truthfully cover folding,
@@ -141,29 +141,56 @@ the microcontroller island has enough room; it stays in the model as a compariso
 ## Board
 
 `electrical/kicad/manent.kicad_pcb` is the circuit unrolled flat: a strip 5.6 mm wide and
-about 34 mm long, X along the arc from the cell tabs, Y across the band. Top copper faces
+about 35 mm long, X along the arc from the cell tabs, Y across the band. Top copper faces
 the titanium, bottom copper faces the finger. A narrow tail with seven test pads leaves
 the microcontroller island and is cut off after the factory test.
 
-What is done:
+### Construction assumed
 
-- Every part of the schematic has a footprint and a place, the same place the fit model
-  uses, so the board and the model cannot drift apart.
-- Every pad carries its net. KiCad's check finds no difference between board and schematic
-  and no rule violation in the placement.
-- Footprints are in `electrical/kicad/manent.pretty`. The chip-scale packages, microphone,
-  switch and protector are drawn from the manufacturers' land patterns; each footprint's
-  description says what was verified and what was assumed.
+| Item | Value | Where it comes from |
+| --- | --- | --- |
+| Islands | rigid, six copper layers, about 0.45 mm | estimate; the fabricator's stackup replaces it |
+| Bends | the two middle layers only (3 and 4), as a two-layer flex | rigid-flex practice |
+| Layer 3 | ground plane from one end of the strip to the other | design choice |
+| Layer 4 | the signals that cross from island to island | design choice |
+| Vias | laser, 0.1 mm hole in a 0.2 mm pad, allowed inside pads, stacked across any span | [fabricators.md](fabricators.md) |
+| Track and gap | 0.075 mm | assumption, right at the published limit of the candidate fabricators |
+| Vias in the bends | none | [fabricators.md](fabricators.md) |
 
-What is not done: **no track is routed.** All 154 connections are still open. Routing the
-0.3 mm pitch microcontroller needs microvias under the chip on a rigid island of at least
-six layers, and the layer stack has to be agreed with the fabricator first: the board file
-uses a plain four-layer stack as a stand-in. The rules set in the project file (0.075 mm
-track and gap, 0.2 mm microvia) are an assumption about that fabricator, not a quote.
+### What is done
+
+- Every part has a footprint and a place, the same place the fit model uses.
+- **Every connection is routed**: 238 tracks, 465 mm of copper in all, and 236 vias, of which
+  124 join two neighbouring layers and 112 are stacks across three or more.
+- KiCad's check on the routed board finds no rule violation, no open connection and no
+  difference from the schematic. `make board` repeats that check; `make route` routes again
+  from scratch.
+- The grid packages fan out ring by ring: the outer balls leave on the surface, each ring
+  further in drops one layer deeper, so no ball is walled in.
+
+### What this routing is, and is not
+
+It was drawn by a small maze router written for this board (`electrical/gen/router.py`), which
+only knows the clearance rules. It shows that the circuit can be connected in six layers with
+two layers across the bends. It is **not a layout to send to a fabricator**:
+
+- All tracks are 0.075 mm wide, the cell and supply tracks included.
+- Nothing is impedance controlled: the antenna feed and the matching network need it.
+- Parts are packed for space, not by function. Decoupling capacitors are on the right
+  island but not necessarily next to the pin they serve, and the loop of the 1.8 V
+  converter was not kept small.
+- The ground plane on a flex layer is solid; a flex that bends usually wants it hatched.
+- Stacked microvias across up to six layers, and vias inside the pads of the small passives,
+  need an any-layer build with filled and capped vias: the most expensive kind.
+- A second reviewer, human, has not looked at it.
+
+Footprints are in `electrical/kicad/manent.pretty`. The chip-scale packages, microphone,
+switch and protector are drawn from the manufacturers' land patterns; each footprint's
+description says what was verified and what was assumed.
 
 Courtyard checks are switched off: stock courtyards leave rework room this board does not
-have. Spacing is enforced by the packer instead, 0.15 mm between land patterns and 0.3 mm
-around the fine-pitch packages.
+have. Spacing is enforced by the packer instead, 0.15 mm between land patterns and 0.3 to
+0.45 mm around the fine-pitch packages.
 
 ## Radio
 

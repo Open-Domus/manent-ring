@@ -19,44 +19,44 @@
         {
           "island": "contacts",
           "length": 3.0,
-          "stack_height": 0.75,
+          "stack_height": 1.0,
           "clearance": 0.684,
-          "plane_radius": 9.765,
+          "plane_radius": 9.89,
           "ok": true,
           "problems": []
         },
         {
           "island": "button",
           "length": 2.4,
-          "stack_height": 1.15,
-          "clearance": 0.496,
-          "plane_radius": 10.815,
+          "stack_height": 1.4,
+          "clearance": 0.372,
+          "plane_radius": 10.69,
           "ok": true,
           "problems": []
         },
         {
           "island": "soc",
-          "length": 5.57,
-          "stack_height": 1.65,
-          "clearance": 0.068,
-          "plane_radius": 10.445,
+          "length": 6.35,
+          "stack_height": 1.7,
+          "clearance": 0.053,
+          "plane_radius": 10.435,
           "ok": false,
           "problems": []
         },
         {
           "island": "audio",
           "length": 4.2,
-          "stack_height": 1.48,
-          "clearance": 0.306,
-          "plane_radius": 11.195,
+          "stack_height": 1.73,
+          "clearance": 0.181,
+          "plane_radius": 11.07,
           "ok": true,
           "problems": []
         },
         {
           "island": "power",
           "length": 4.82,
-          "stack_height": 1.6,
-          "clearance": 0.195,
+          "stack_height": 1.65,
+          "clearance": 0.17,
           "plane_radius": 10.828,
           "ok": true,
           "problems": []
@@ -64,8 +64,8 @@
         {
           "island": "antenna",
           "length": 5.0,
-          "stack_height": 0.65,
-          "clearance": 0.764,
+          "stack_height": 0.9,
+          "clearance": 0.729,
           "plane_radius": 10.672,
           "ok": true,
           "problems": []
@@ -87,10 +87,10 @@
         "ok": false
       },
       "arc": {
-        "electronics_mm": 34.99,
+        "electronics_mm": 35.77,
         "cell_arc_deg": 141.1,
         "cell_centre_deg": -95.3,
-        "slack_mm": 4.51,
+        "slack_mm": 3.73,
         "placed": [
           {
             "island": "contacts",
@@ -102,19 +102,19 @@
           },
           {
             "island": "soc",
-            "centre_deg": 51.9
+            "centre_deg": 54.1
           },
           {
             "island": "audio",
-            "centre_deg": 83.8
+            "centre_deg": 88.0
           },
           {
             "island": "power",
-            "centre_deg": 113.5
+            "centre_deg": 117.8
           },
           {
             "island": "antenna",
-            "centre_deg": 145.5
+            "centre_deg": 149.7
           }
         ],
         "ok": true,
@@ -151,44 +151,44 @@
         {
           "island": "contacts",
           "length": 3.0,
-          "stack_height": 0.75,
+          "stack_height": 1.0,
           "clearance": 0.751,
-          "plane_radius": 9.7,
+          "plane_radius": 9.825,
           "ok": true,
           "problems": []
         },
         {
           "island": "button",
           "length": 2.4,
-          "stack_height": 1.15,
-          "clearance": 0.524,
-          "plane_radius": 10.87,
+          "stack_height": 1.4,
+          "clearance": 0.399,
+          "plane_radius": 10.745,
           "ok": true,
           "problems": []
         },
         {
           "island": "soc",
-          "length": 5.57,
-          "stack_height": 1.65,
-          "clearance": 0.119,
-          "plane_radius": 10.452,
+          "length": 6.35,
+          "stack_height": 1.7,
+          "clearance": 0.102,
+          "plane_radius": 10.445,
           "ok": true,
           "problems": []
         },
         {
           "island": "audio",
           "length": 4.2,
-          "stack_height": 1.48,
-          "clearance": 0.348,
-          "plane_radius": 11.255,
+          "stack_height": 1.73,
+          "clearance": 0.223,
+          "plane_radius": 11.13,
           "ok": true,
           "problems": []
         },
         {
           "island": "power",
           "length": 4.82,
-          "stack_height": 1.6,
-          "clearance": 0.258,
+          "stack_height": 1.65,
+          "clearance": 0.233,
           "plane_radius": 10.845,
           "ok": true,
           "problems": []
@@ -196,7 +196,7 @@
         {
           "island": "antenna",
           "length": 5.0,
-          "stack_height": 0.65,
+          "stack_height": 0.9,
           "clearance": 0.827,
           "plane_radius": 10.703,
           "ok": true,
@@ -219,10 +219,10 @@
         "ok": true
       },
       "arc": {
-        "electronics_mm": 34.99,
+        "electronics_mm": 35.77,
         "cell_arc_deg": 157.0,
         "cell_centre_deg": -103.1,
-        "slack_mm": 1.64,
+        "slack_mm": 0.86,
         "placed": [
           {
             "island": "contacts",
@@ -234,19 +234,19 @@
           },
           {
             "island": "soc",
-            "centre_deg": 51.9
+            "centre_deg": 54.0
           },
           {
             "island": "audio",
-            "centre_deg": 83.6
+            "centre_deg": 87.9
           },
           {
             "island": "power",
-            "centre_deg": 113.4
+            "centre_deg": 117.6
           },
           {
             "island": "antenna",
-            "centre_deg": 145.3
+            "centre_deg": 149.5
           }
         ],
         "ok": true,
@@ -270,56 +270,56 @@
       {
         "us_size": 6,
         "inner_diameter": 16.51,
-        "max_cell_length": 25.0,
+        "max_cell_length": 24.3,
         "best_cell": null,
         "capacity_mah": null
       },
       {
         "us_size": 7,
         "inner_diameter": 17.32,
-        "max_cell_length": 27.6,
+        "max_cell_length": 26.8,
         "best_cell": null,
         "capacity_mah": null
       },
       {
         "us_size": 8,
         "inner_diameter": 18.13,
-        "max_cell_length": 30.1,
+        "max_cell_length": 29.4,
         "best_cell": null,
         "capacity_mah": null
       },
       {
         "us_size": 9,
         "inner_diameter": 18.95,
-        "max_cell_length": 32.7,
+        "max_cell_length": 31.9,
         "best_cell": null,
         "capacity_mah": null
       },
       {
         "us_size": 10,
         "inner_diameter": 19.76,
-        "max_cell_length": 35.2,
+        "max_cell_length": 34.5,
         "best_cell": null,
         "capacity_mah": null
       },
       {
         "us_size": 11,
         "inner_diameter": 20.57,
-        "max_cell_length": 37.8,
+        "max_cell_length": 37.0,
         "best_cell": null,
         "capacity_mah": null
       },
       {
         "us_size": 12,
         "inner_diameter": 21.38,
-        "max_cell_length": 40.3,
+        "max_cell_length": 39.6,
         "best_cell": null,
         "capacity_mah": null
       },
       {
         "us_size": 13,
         "inner_diameter": 22.2,
-        "max_cell_length": 42.9,
+        "max_cell_length": 42.1,
         "best_cell": null,
         "capacity_mah": null
       }
@@ -328,56 +328,56 @@
       {
         "us_size": 6,
         "inner_diameter": 16.51,
-        "max_cell_length": 25.2,
+        "max_cell_length": 24.4,
         "best_cell": "grp1707_22",
         "capacity_mah": 14.5
       },
       {
         "us_size": 7,
         "inner_diameter": 17.32,
-        "max_cell_length": 27.7,
+        "max_cell_length": 27.0,
         "best_cell": "grp160626",
         "capacity_mah": 15.5
       },
       {
         "us_size": 8,
         "inner_diameter": 18.13,
-        "max_cell_length": 30.3,
+        "max_cell_length": 29.5,
         "best_cell": "grp1707_29",
         "capacity_mah": 21.5
       },
       {
         "us_size": 9,
         "inner_diameter": 18.95,
-        "max_cell_length": 32.8,
+        "max_cell_length": 32.1,
         "best_cell": "grp1707_29",
         "capacity_mah": 21.5
       },
       {
         "us_size": 10,
         "inner_diameter": 19.76,
-        "max_cell_length": 35.4,
+        "max_cell_length": 34.6,
         "best_cell": "grp1707_29",
         "capacity_mah": 21.5
       },
       {
         "us_size": 11,
         "inner_diameter": 20.57,
-        "max_cell_length": 37.9,
+        "max_cell_length": 37.2,
         "best_cell": "grp1707_29",
         "capacity_mah": 21.5
       },
       {
         "us_size": 12,
         "inner_diameter": 21.38,
-        "max_cell_length": 40.5,
+        "max_cell_length": 39.7,
         "best_cell": "grp1707_29",
         "capacity_mah": 21.5
       },
       {
         "us_size": 13,
         "inner_diameter": 22.2,
-        "max_cell_length": 43.0,
+        "max_cell_length": 42.3,
         "best_cell": "grp1707_29",
         "capacity_mah": 21.5
       }

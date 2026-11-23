@@ -1,6 +1,6 @@
 #!/bin/sh
 # Run KiCad on the generated design: the installed one if present, otherwise the official
-# container (docker pull kicad/kicad:10.0).   tools/kicad.sh schematic | board
+# container (docker pull kicad/kicad:10.0).   tools/kicad.sh schematic | board | route
 set -e
 cd "$(dirname "$0")/../electrical"
 mkdir -p out
@@ -18,11 +18,19 @@ schematic)
   run kicad-cli sch export pdf -o ../out/schematic.pdf manent.kicad_sch
   ;;
 board)
+  # Places the parts, then adds the tracks saved in out/routes.json.
   py gen/pcb_build.py
+  py gen/pcb_route.py
   run kicad-cli pcb drc --format json --severity-all --schematic-parity -o ../out/drc.json manent.kicad_pcb
-  run kicad-cli pcb export svg --mode-single --page-size-mode 2 --exclude-drawing-sheet \
-    --layers F.Cu,Edge.Cuts,Dwgs.User,Cmts.User -o ../out/board-top.svg manent.kicad_pcb
-  run kicad-cli pcb export svg --mode-single --page-size-mode 2 --exclude-drawing-sheet --mirror \
-    --layers B.Cu,Edge.Cuts,Dwgs.User -o ../out/board-bottom.svg manent.kicad_pcb
+  for layer in F.Cu In1.Cu In2.Cu In3.Cu In4.Cu B.Cu; do
+    run kicad-cli pcb export svg --mode-single --page-size-mode 2 --exclude-drawing-sheet \
+      --layers "$layer,Edge.Cuts,Dwgs.User" -o "../out/board-$layer.svg" manent.kicad_pcb
+  done
+  ;;
+route)
+  # Routes from scratch: several minutes. Needs the pad geometry of the placed board.
+  py gen/pcb_build.py
+  py gen/pcb_dump.py
+  (cd .. && uv run python -u -m electrical.gen.router)
   ;;
 esac

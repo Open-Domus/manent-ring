@@ -1,4 +1,4 @@
-.PHONY: all test fit cad drawings power schematic board clean
+.PHONY: all test fit cad drawings power schematic board route clean
 
 all: schematic board test fit drawings power cad
 
@@ -26,6 +26,11 @@ schematic:
 board:
 	uv run python -m electrical.gen.board
 	tools/kicad.sh board
+
+# Routes the board again from scratch (minutes). Needed after any change to the placement.
+route:
+	uv run python -m electrical.gen.board
+	tools/kicad.sh route
 
 clean:
 	rm -f mechanical/out/*.step mechanical/out/*.svg mechanical/out/fit-report.json

@@ -46,8 +46,10 @@ class Island:
 
 FLEX_WIDTH = 5.6       # axial width of the flex
 FLEX_T = 0.11          # two-layer flex between islands
-STIFF_T = 0.20         # flex with stiffener
-RIGID_T = 0.40         # four-layer rigid island for the fine-pitch parts
+# Every island is rigid: six copper layers with the two flex layers in the middle. The
+# thickness is an estimate, to be replaced by the fabricator's stackup: six copper layers of
+# about 0.015, five dielectrics of about 0.05, solder mask on both faces.
+RIGID_T = 0.45
 SOLDER = 0.05          # stand-off of a soldered part
 BEND = 1.0             # length of each bend zone between islands
 CELL_TABS = 3.0        # arc taken by the cell tabs and their joint
@@ -58,18 +60,18 @@ BUTTON_DEG = 25.0      # where the button sits: the side of the finger, towards 
 PART_SPACING = 0.15    # between the land patterns of two parts on the same face
 EDGE_MARGIN = 0.15     # from a land pattern to the edge of the board
 # Extra room kept clear around the fine-pitch packages, for their tracks to fan out.
-COURTYARD = {"soc": 0.3, "pmic": 0.3, "flash": 0.3, "mic": 0.2}
+COURTYARD = {"soc": 0.45, "pmic": 0.3, "flash": 0.3, "mic": 0.2}
 
 # name, board thickness, seat, shortest allowed length, where its centre must fall.
 # Order along the arc, starting at the cell tabs: thumb side -> back of the finger -> far side.
 ISLAND_SPECS = (
     # Charging and service pads face the finger; cell protection sits behind them.
-    ("contacts", STIFF_T, "in", 3.0, None),
-    ("button", STIFF_T, "out", 2.4, (-15.0, 30.0)),
+    ("contacts", RIGID_T, "in", 3.0, None),
+    ("button", RIGID_T, "out", 2.4, (-15.0, 30.0)),
     ("soc", RIGID_T, "mid", 0.0, None),
-    ("audio", STIFF_T, "out", 0.0, (60.0, 120.0)),
+    ("audio", RIGID_T, "out", 0.0, (60.0, 120.0)),
     ("power", RIGID_T, "mid", 0.0, None),
-    ("antenna", STIFF_T, "mid", 5.0, None),       # kept long: the antenna needs clear board
+    ("antenna", RIGID_T, "mid", 5.0, None),       # kept long: the antenna needs clear board
 )
 PROTECTION_NETS = {"CELL_P", "CELL_N", "SENSE", "VM", "PROT_CO", "PROT_DO", "FET_MID"}
 

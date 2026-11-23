@@ -15,7 +15,7 @@ Nothing here has been built or measured. This is a design on paper, checked by s
 | Parts with sizes and how far each is verified | [parts/parts.yaml](parts/parts.yaml) |
 | Circuit, as data | [electrical/gen/design.py](electrical/gen/design.py) |
 | Schematic (KiCad 10), PDF, netlist, bill of materials | `electrical/kicad/`, `electrical/out/` |
-| Board: parts placed, nets assigned, not routed | `electrical/kicad/manent.kicad_pcb`, `electrical/out/board-*.svg` |
+| Board: placed and routed (connectivity proof, not a fabrication layout) | `electrical/kicad/manent.kicad_pcb`, `electrical/out/board-*.svg` |
 | Fit model, drawings, STEP | `mechanical/`, `mechanical/out/` |
 
 ## Build
@@ -25,6 +25,7 @@ Needs `uv`, and either KiCad 10 or Docker (`docker pull kicad/kicad:10.0`).
 ```
 make all        # schematic, board, checks, tests, fit report, drawings, budgets, STEP
 make test       # tests only
+make route      # route the board again from scratch (several minutes)
 ```
 
 The schematic and the board are generated: edit `electrical/gen/design.py` and the fit

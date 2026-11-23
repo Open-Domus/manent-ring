@@ -2,7 +2,8 @@
 
 Runs with KiCad's own Python (the pcbnew module), not the project environment:
     python3 gen/pcb_build.py          (from the electrical directory)
-Footprints are placed and their pads given their nets. No tracks are drawn.
+Footprints are placed and their pads given their nets. Tracks come later, from
+pcb_route.py.
 """
 import json
 from pathlib import Path
@@ -16,7 +17,7 @@ mm = pcbnew.FromMM
 pt = lambda x, y: pcbnew.VECTOR2I(mm(x), mm(y))
 
 board = pcbnew.BOARD()
-board.SetCopperLayerCount(4)
+board.SetCopperLayerCount(data["layers"])
 nets = {}
 for part in data["parts"]:
     for name in part["nets"].values():

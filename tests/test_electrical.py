@@ -32,7 +32,7 @@ def test_no_vibration_motor():
     assert not any("haptic" in c.value.lower() or "motor" in c.value.lower() for c in build())
 
 
-def test_board_has_every_part_placed_without_rule_violations():
+def test_board_is_routed_without_rule_violations():
     import json
     drc = NETLIST.with_name("drc.json")
     if not drc.exists():
@@ -40,5 +40,4 @@ def test_board_has_every_part_placed_without_rule_violations():
     report = json.loads(drc.read_text())
     assert report["violations"] == []
     assert report["schematic_parity"] == []       # same parts, footprints and nets as the schematic
-    # The board is placed, not routed: every connection is still open.
-    assert len(report["unconnected_items"]) > 100
+    assert report["unconnected_items"] == []      # every connection is made
