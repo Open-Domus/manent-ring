@@ -9,3 +9,5 @@ mechanical/out/*.step
 electrical/kicad/*.kicad_prl
 electrical/out/erc.json
 electrical/out/netlist.xml
+electrical/out/drc.json
+electrical/out/board.json

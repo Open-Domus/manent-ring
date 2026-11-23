@@ -6,7 +6,7 @@ island and a face, then packed in columns across the flex; the island is as long
 fuller face. Angles: 90 deg is the back of the finger (LED and microphone), 0 deg is
 the side facing the thumb (button), 270 deg is the palm side (cell).
 """
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 import math
@@ -14,6 +14,7 @@ import math
 import yaml
 
 from electrical.gen.design import build as build_circuit
+from electrical.gen.footprints import extent, footprint_of
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -29,6 +30,8 @@ class Placed:
     y: float           # axial centre, mm from the band centre
     face: str          # "out": towards the titanium, "in": towards the finger
     turned: bool = False   # True swaps length and width
+    ref: str = ""          # reference in the circuit
+    fp: str = ""           # footprint name
 
 
 @dataclass(frozen=True)
@@ -52,8 +55,8 @@ CLOSING_GAP = 1.0      # free arc left to close the loop
 SWELL = 0.08           # cell thickness growth to allow for
 CELL_GAP = 0.05        # insulating wrap between the swollen cell and the walls
 BUTTON_DEG = 25.0      # where the button sits: the side of the finger, towards the thumb
-PART_SPACING = 0.20    # between two parts on the same face
-EDGE_MARGIN = 0.10     # from a part to the edge of the island
+PART_SPACING = 0.15    # between the land patterns of two parts on the same face
+EDGE_MARGIN = 0.15     # from a land pattern to the edge of the board
 # Extra room kept clear around the fine-pitch packages, for their tracks to fan out.
 COURTYARD = {"soc": 0.3, "pmic": 0.3, "flash": 0.3, "mic": 0.2}
 
@@ -112,7 +115,7 @@ def home_of(c) -> tuple[str, str]:
 
 
 def pack(sizes: list[tuple[str, float, float]]) -> tuple[list[Placed], float]:
-    """Pack bodies (key, length, width) in columns across the flex.
+    """Pack land patterns (reference, length, width) in columns across the flex.
 
     Largest first; each goes, in the better of its two orientations, where it adds
     the least length. Returns the placements (x from the left edge of the pack,
@@ -149,20 +152,49 @@ def pack(sizes: list[tuple[str, float, float]]) -> tuple[list[Placed], float]:
     return placed, max(0.0, x - PART_SPACING)
 
 
+PORT_OFFSET = 0.71     # microphone sound port, from the body centre along its length
+PORT_KEEPOUT = 0.75    # from the port centre to the nearest land pattern on the other face
+
+
+def _clear_of_ports(placed, room):
+    """The microphone's port is a hole through the board: slide whatever sits on the
+    other face across the band until it is clear of it."""
+    ports = [(p.x, p.y - PORT_OFFSET) if p.turned else (p.x - PORT_OFFSET, p.y)
+             for p in placed if p.part == "mic" and p.face == "in"]
+    out = []
+    for p in placed:
+        if p.face == "out" and ports:
+            (px, py), = ports
+            l, w = room(p.ref)
+            ex, ey = (w, l) if p.turned else (l, w)
+            if abs(p.x - px) < ex / 2 + PORT_KEEPOUT and abs(p.y - py) < ey / 2 + PORT_KEEPOUT:
+                side = 1 if py <= 0 else -1
+                p = replace(p, y=py + side * (ey / 2 + PORT_KEEPOUT))
+                assert abs(p.y) + ey / 2 <= FLEX_WIDTH / 2 - EDGE_MARGIN, "no room beside the port"
+        out.append(p)
+    return out
+
+
 def build_islands() -> tuple[Island, ...]:
     parts = load_parts()["parts"]
     homes: dict[tuple[str, str], list] = {}
+    body, fp = {}, {}
+
+    def room(ref):      # the larger of land pattern and body, plus any fan-out room
+        grow = 2 * COURTYARD.get(body[ref], 0.0)
+        return tuple(max(e, b) + grow for e, b in zip(extent(fp[ref]), parts[body[ref]]["size"]))
+
     for c in build_circuit():
-        body = body_of(c)
-        if body:
-            homes.setdefault(home_of(c), []).append(body)
+        if body_of(c):
+            body[c.ref], fp[c.ref] = body_of(c), footprint_of(c)
+            homes.setdefault(home_of(c), []).append(c.ref)
     islands = []
     for name, thickness, seat, shortest, target in ISLAND_SPECS:
-        faces = {f: pack([(b, *(v + 2 * COURTYARD.get(b, 0.0) for v in parts[b]["size"][:2]))
-                          for b in homes.pop((name, f), [])]) for f in ("in", "out")}
+        faces = {f: pack([(ref, *room(ref)) for ref in homes.pop((name, f), [])]) for f in ("in", "out")}
         length = max(shortest, max(l for _, l in faces.values()) + 2 * EDGE_MARGIN)
-        placed = tuple(Placed(p.part, p.x - l / 2, p.y, f, p.turned)
-                       for f, (ps, l) in faces.items() for p in ps)
+        placed = [Placed(body[p.part], p.x - l / 2, p.y, f, p.turned, p.part, fp[p.part])
+                  for f, (ps, l) in faces.items() for p in ps]
+        placed = tuple(_clear_of_ports(placed, room))
         islands.append(Island(name, math.ceil(length * 100 - 1e-9) / 100, thickness, placed, target, seat))
     assert not homes, f"parts assigned to unknown islands: {list(homes)}"
     return tuple(islands)

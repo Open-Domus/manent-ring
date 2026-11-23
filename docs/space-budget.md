@@ -11,7 +11,7 @@ figures are catalogue values, not a supplier's drawing.
 - Cell: 8% thickness growth allowed for, plus 0.05 of wrap on each side.
 - Flex 5.6 wide; islands joined by 1.0 of bare flex; 3.0 for the cell tabs.
 - Every part in the bill of materials is placed, on one of the two faces of an island, in columns
-  across the flex, 0.2 apart, with extra room around the fine-pitch packages. This checks that
+  across the flex, 0.15 apart, with extra room around the fine-pitch packages. This checks that
   the parts have room; it does not check that the tracks between them can be routed.
 - The button sits at 25 degrees, towards the thumb; microphone and light must land on the back
   of the finger (60 to 120 degrees). Arc left over lies between the antenna and the far end of the cell.
@@ -27,13 +27,13 @@ Cavity height available to a centred part, by part width: 4.0 wide: 2.05, 5.0 wi
 | --- | --- | --- | --- | --- | --- |
 | contacts | 3.0 | 0.75 | 0.68 | 5 deg | fits |
 | button | 2.4 | 1.15 | 0.50 | 25 deg | fits |
-| soc | 4.75 | 1.65 | 0.11 | 50 deg | fits |
-| audio | 4.05 | 1.48 | 0.30 | 79 deg | fits |
-| power | 3.88 | 1.60 | 0.19 | 106 deg | fits |
-| antenna | 5.0 | 0.65 | 0.83 | 135 deg | fits |
+| soc | 5.57 | 1.65 | 0.07 | 52 deg | FAILS  |
+| audio | 4.2 | 1.48 | 0.31 | 84 deg | fits |
+| power | 4.82 | 1.60 | 0.20 | 114 deg | fits |
+| antenna | 5.0 | 0.65 | 0.76 | 146 deg | fits |
 
 - **Cell**: GRP160626, 26.0 x 6.0 x 1.6, 15.5 mAh. Room left on each side after swelling: 0.03 (less than the 0.05 required). It spans 141.1 degrees.
-- **Arc**: electronics take 33.08 of arc; +6.4 is left over.
+- **Arc**: electronics take 34.99 of arc; +4.5 is left over.
 - **Mass** (estimate): titanium 1.29 g, total about 2.94 g.
 - Drawings: [plan](../mechanical/out/plan-A.svg), [audio island section](../mechanical/out/section-A-audio.svg), [SoC island section](../mechanical/out/section-A-soc.svg).
 
@@ -48,13 +48,13 @@ Cavity height available to a centred part, by part width: 4.0 wide: 2.15, 5.0 wi
 | --- | --- | --- | --- | --- | --- |
 | contacts | 3.0 | 0.75 | 0.75 | 5 deg | fits |
 | button | 2.4 | 1.15 | 0.52 | 25 deg | fits |
-| soc | 4.75 | 1.65 | 0.18 | 50 deg | fits |
-| audio | 4.05 | 1.48 | 0.35 | 79 deg | fits |
-| power | 3.88 | 1.60 | 0.25 | 106 deg | fits |
-| antenna | 5.0 | 0.65 | 0.86 | 135 deg | fits |
+| soc | 5.57 | 1.65 | 0.12 | 52 deg | fits |
+| audio | 4.2 | 1.48 | 0.35 | 84 deg | fits |
+| power | 4.82 | 1.60 | 0.26 | 113 deg | fits |
+| antenna | 5.0 | 0.65 | 0.83 | 145 deg | fits |
 
 - **Cell**: GRP1707xx, 29 mm (exact code to confirm), 29.0 x 6.5 x 1.7, 21.5 mAh. Room left on each side after swelling: 0.06 (enough). It spans 157.0 degrees.
-- **Arc**: electronics take 33.08 of arc; +3.5 is left over.
+- **Arc**: electronics take 34.99 of arc; +1.6 is left over.
 - **Mass** (estimate): titanium 1.42 g, total about 3.28 g.
 - Drawings: [plan](../mechanical/out/plan-B.svg), [audio island section](../mechanical/out/section-B-audio.svg), [SoC island section](../mechanical/out/section-B-soc.svg).
 
@@ -64,14 +64,14 @@ The electronics need the same arc on every finger, so the cell gets what is left
 
 | US size | Inner diameter | Longest cell | Best catalogue cell, 7.4 band | Best catalogue cell, 8.0 band |
 | --- | --- | --- | --- | --- |
-| 6 | 16.51 | 27.1 | none | grp160626 (15.5 mAh) |
-| 7 | 17.32 | 29.6 | none | grp1707_29 (21.5 mAh) |
-| 8 | 18.13 | 32.2 | none | grp1707_29 (21.5 mAh) |
-| 9 | 18.95 | 34.7 | none | grp1707_29 (21.5 mAh) |
-| 10 | 19.76 | 37.3 | none | grp1707_29 (21.5 mAh) |
-| 11 | 20.57 | 39.8 | none | grp1707_29 (21.5 mAh) |
-| 12 | 21.38 | 42.4 | none | grp1707_29 (21.5 mAh) |
-| 13 | 22.2 | 44.9 | none | grp1707_29 (21.5 mAh) |
+| 6 | 16.51 | 25.2 | none | grp1707_22 (14.5 mAh) |
+| 7 | 17.32 | 27.7 | none | grp160626 (15.5 mAh) |
+| 8 | 18.13 | 30.3 | none | grp1707_29 (21.5 mAh) |
+| 9 | 18.95 | 32.8 | none | grp1707_29 (21.5 mAh) |
+| 10 | 19.76 | 35.4 | none | grp1707_29 (21.5 mAh) |
+| 11 | 20.57 | 37.9 | none | grp1707_29 (21.5 mAh) |
+| 12 | 21.38 | 40.5 | none | grp1707_29 (21.5 mAh) |
+| 13 | 22.2 | 43.0 | none | grp1707_29 (21.5 mAh) |
 
 The largest cell in the catalogue family is 29 long. Where the table shows room for a longer one,
 more capacity needs a cell made to order: roughly 0.74 mAh per millimetre, by proportion.

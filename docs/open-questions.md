@@ -15,7 +15,7 @@
 | nPM1304: what to do with SW2, VOUT2, LED0-2, GPIO2-3 when unused; which capacitor on which net | Nordic's reference design files for configuration 2 |
 | W25Q128JW WLCSP body size; availability of the special-order package | Winbond |
 | Flash /WP and /HOLD termination in single-bit SPI | Winbond |
-| T5838 pad positions; EVP-BB land pattern | datasheet drawings |
+| nRF54L15 land pad diameter; nPM1304 ball pitch direction; S-82A1A pin order; 32 MHz crystal land pattern | manufacturers' package drawings |
 | Cell: exact part codes, curvature per ring size, built-in protection, minimum order | quote from Grepow and one other supplier |
 | N-MOSFETs for the light and the protection; 2.2 uH inductor under 0.8 mm tall | distributor search |
 | nRF54L15 errata for P1.04-P1.07 at power-on | Nordic errata, revision in stock |
@@ -37,5 +37,5 @@
 
 ## Not designed yet
 
-Board layout, the dock, the button cap, the antenna, firmware changes (pins, power chip
+Board routing and layer stack (parts are placed, no track is drawn), the dock, the button cap, the antenna, firmware changes (pins, power chip
 driver, light, gestures), compliance (radio, potted lithium cell).

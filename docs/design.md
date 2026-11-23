@@ -127,16 +127,43 @@ The full list with part numbers is `electrical/out/bom.csv`.
   0.375 mm port), one small hole or thinned window for the light, one for the button.
 - Layout: six islands, parts on both faces. Flash sits behind the microcontroller, the small
   power parts behind the power chip, the cell protection behind the charging pads. This
-  keeps the electronics to about 33 mm of arc and leaves the rest to the cell.
+  keeps the electronics to about 35 mm of arc and leaves the rest to the cell.
 - Circuit: rigid islands for the fine-pitch chips joined by two-layer flex. The 0.3 mm
   pitch of the microcontroller package needs microvias under the chip; Nordic's own
   reference board is an eight-layer build. This is work for a specialist fabricator and
   an assembler with X-ray inspection. "Assembled by hand" can truthfully cover folding,
   joining the cell, potting and finishing.
 
-Whether it all fits is in [space-budget.md](space-budget.md). In short: the electronics fit
-in both envelopes; the cell fits only in the 8.0 mm band, which is the one adopted. The
-7.4 mm envelope stays in the model as a comparison.
+Whether it all fits is in [space-budget.md](space-budget.md). In short: everything fits
+in the 8.0 mm band, which is the one adopted. In the 7.4 mm envelope neither the cell nor
+the microcontroller island has enough room; it stays in the model as a comparison.
+
+## Board
+
+`electrical/kicad/manent.kicad_pcb` is the circuit unrolled flat: a strip 5.6 mm wide and
+about 34 mm long, X along the arc from the cell tabs, Y across the band. Top copper faces
+the titanium, bottom copper faces the finger. A narrow tail with seven test pads leaves
+the microcontroller island and is cut off after the factory test.
+
+What is done:
+
+- Every part of the schematic has a footprint and a place, the same place the fit model
+  uses, so the board and the model cannot drift apart.
+- Every pad carries its net. KiCad's check finds no difference between board and schematic
+  and no rule violation in the placement.
+- Footprints are in `electrical/kicad/manent.pretty`. The chip-scale packages, microphone,
+  switch and protector are drawn from the manufacturers' land patterns; each footprint's
+  description says what was verified and what was assumed.
+
+What is not done: **no track is routed.** All 154 connections are still open. Routing the
+0.3 mm pitch microcontroller needs microvias under the chip on a rigid island of at least
+six layers, and the layer stack has to be agreed with the fabricator first: the board file
+uses a plain four-layer stack as a stand-in. The rules set in the project file (0.075 mm
+track and gap, 0.2 mm microvia) are an assumption about that fabricator, not a quote.
+
+Courtyard checks are switched off: stock courtyards leave rework room this board does not
+have. Spacing is enforced by the packer instead, 0.15 mm between land patterns and 0.3 mm
+around the fine-pitch packages.
 
 ## Radio
 

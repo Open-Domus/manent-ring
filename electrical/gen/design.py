@@ -7,6 +7,7 @@ bill of materials.
 from collections import defaultdict
 
 from .emit import Component, Pin, SymDef, two_pin
+from .footprints import LIB_NAME, footprint_of
 
 SHEETS = [("power", "Power and charging"), ("mcu_rf", "Microcontroller and radio"),
           ("audio", "Microphone"), ("storage", "Flash memory"), ("ui", "Button, light, pads")]
@@ -260,10 +261,10 @@ def build() -> list[Component]:
     # ---- button, light, pads -----------------------------------------------------------
     add(SW, "tactile", "ui", ("BTN_N", "GND"), mpn="EVPBB2A9B000", mfr="Panasonic", package="2.6x1.6x0.53",
         note="1.6 N; pulled up inside the PMIC (SHPHLD)")
-    add(D, "Schottky", "ui", ("BTN_WAKE", "BTN_N"), mpn="RB521ZS-30", mfr="Rohm", package="0201 class",
-        note="Anode at the SoC: keeps the PMIC pull-up voltage off the 1.8 V pin")
-    add(LED, "red", "ui", ("VSYS", "LED_K"), mpn="SML-P11VT", mfr="Rohm", package="1.0x0.6x0.2",
-        note="For the wearer only: about 0.1 mA")
+    add(D, "Schottky", "ui", ("BTN_N", "BTN_WAKE"), mpn="RB521ZS-30", mfr="Rohm", package="0201 class",
+        note="Pin 1 is the cathode. Anode at the SoC: keeps the PMIC pull-up voltage off the 1.8 V pin")
+    add(LED, "red", "ui", ("LED_K", "VSYS"), mpn="SML-P11VT", mfr="Rohm", package="1.0x0.6x0.2",
+        note="Pin 1 is the cathode. For the wearer only: about 0.1 mA")
     res("22k", "LED_K", "LED_SW", "ui", note="About 0.06-0.11 mA over the cell voltage; adjust after a look through the resin")
     add(NFET, "N-MOSFET", "ui", {"1": "VMIC", "2": "GND", "3": "LED_SW"}, mpn="to choose",
         note="Gate is the microphone rail: the light is on whenever the microphone has power. Vgs(th) under 1 V")
@@ -275,6 +276,10 @@ def build() -> list[Component]:
     for label, net in (("nRESET", "NRESET"), ("UART TX", "UART_TX"), ("UART RX", "UART_RX"), ("1V8", "V1V8"),
                        ("GND", "GND"), ("VBAT", "VBAT"), ("VBUS", "VBUS")):
         add(PAD, label, "ui", (net,), note="Test tail, cut off before potting")
+    for c in comps:
+        fp = footprint_of(c)
+        if fp:
+            c.fields["Footprint"] = f"{LIB_NAME}:{fp}"
     return comps
 
 

@@ -1,6 +1,6 @@
-.PHONY: all test fit cad drawings power schematic clean
+.PHONY: all test fit cad drawings power schematic board clean
 
-all: schematic test fit drawings power cad
+all: schematic board test fit drawings power cad
 
 test:
 	uv run pytest -q
@@ -22,6 +22,10 @@ schematic:
 	uv run python -m electrical.gen
 	tools/kicad.sh
 	uv run python -m electrical.gen.checks
+
+board:
+	uv run python -m electrical.gen.board
+	tools/kicad.sh board
 
 clean:
 	rm -f mechanical/out/*.step mechanical/out/*.svg mechanical/out/fit-report.json

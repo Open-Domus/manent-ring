@@ -32,6 +32,6 @@ MK1,1,T5838,TDK InvenSense,MMICT5838-00-012,3.5x2.65x0.98 bottom port,yes,No pul
 U4,1,W25Q128JW,Winbond,W25Q128JWYIQ (or thin W25Q128JWKIQ),"WLCSP-21, 0.5 mm pitch",yes,"Special-order package; body size not published, ask Winbond"
 R8 R9 R10 R12,4,100k,,,0201,yes,Keeps the chip deselected while the rail rises | Termination in single-bit SPI not stated in the datasheet | Light off while the SoC is in reset
 SW1,1,tactile,Panasonic,EVPBB2A9B000,2.6x1.6x0.53,yes,1.6 N; pulled up inside the PMIC (SHPHLD)
-D2,1,Schottky,Rohm,RB521ZS-30,0201 class,yes,Anode at the SoC: keeps the PMIC pull-up voltage off the 1.8 V pin
-D3,1,red,Rohm,SML-P11VT,1.0x0.6x0.2,yes,For the wearer only: about 0.1 mA
+D2,1,Schottky,Rohm,RB521ZS-30,0201 class,yes,Pin 1 is the cathode. Anode at the SoC: keeps the PMIC pull-up voltage off the 1.8 V pin
+D3,1,red,Rohm,SML-P11VT,1.0x0.6x0.2,yes,Pin 1 is the cathode. For the wearer only: about 0.1 mA
 R11,1,22k,,,0201,yes,About 0.06-0.11 mA over the cell voltage; adjust after a look through the resin

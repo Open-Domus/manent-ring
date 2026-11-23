@@ -21,7 +21,8 @@ Usable capacity is taken as 80% of the rating.
 
 | Cell | Low draw | Nominal | High draw |
 | --- | --- | --- | --- |
-| 21.5 mAh (US 7 and up) | 16.2 h | 11.7 h | 7.3 h |
+| 21.5 mAh (US 8 and up) | 16.2 h | 11.7 h | 7.3 h |
+| 15.5 mAh (US 7) | 11.7 h | 8.4 h | 5.3 h |
 | 14.5 mAh (US 6) | 11.0 h | 7.9 h | 4.9 h |
 
 ## Days between charges
@@ -31,7 +32,8 @@ standby at 15 uA (slow advertising).
 
 | Cell | 15 min/day | 30 min/day | 60 min/day |
 | --- | --- | --- | --- |
-| 21.5 mAh (US 7 and up) | 22 days | 14 days | 8 days |
+| 21.5 mAh (US 8 and up) | 22 days | 14 days | 8 days |
+| 15.5 mAh (US 7) | 16 days | 10 days | 6 days |
 | 14.5 mAh (US 6) | 15 days | 10 days | 6 days |
 
 ## Standby alone

@@ -5,7 +5,7 @@ from pathlib import Path
 V_CELL = 3.8          # nominal cell voltage
 BUCK_EFF = 0.85       # assumed efficiency of the 1.8 V buck at these loads
 USABLE = 0.80         # share of the rated capacity counted on
-CELLS = {"21.5 mAh (US 7 and up)": 21.5, "14.5 mAh (US 6)": 14.5}
+CELLS = {"21.5 mAh (US 8 and up)": 21.5, "15.5 mAh (US 7)": 15.5, "14.5 mAh (US 6)": 14.5}
 
 # (name, low, nominal, high) in milliwatts at the 1.8 V rail unless noted; source
 RECORDING = [

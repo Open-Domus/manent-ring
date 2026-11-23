@@ -15,6 +15,7 @@ Nothing here has been built or measured. This is a design on paper, checked by s
 | Parts with sizes and how far each is verified | [parts/parts.yaml](parts/parts.yaml) |
 | Circuit, as data | [electrical/gen/design.py](electrical/gen/design.py) |
 | Schematic (KiCad 10), PDF, netlist, bill of materials | `electrical/kicad/`, `electrical/out/` |
+| Board: parts placed, nets assigned, not routed | `electrical/kicad/manent.kicad_pcb`, `electrical/out/board-*.svg` |
 | Fit model, drawings, STEP | `mechanical/`, `mechanical/out/` |
 
 ## Build
@@ -22,11 +23,12 @@ Nothing here has been built or measured. This is a design on paper, checked by s
 Needs `uv`, and either KiCad 10 or Docker (`docker pull kicad/kicad:10.0`).
 
 ```
-make all        # schematic + checks, tests, fit report, drawings, budgets, STEP
+make all        # schematic, board, checks, tests, fit report, drawings, budgets, STEP
 make test       # tests only
 ```
 
-The schematic is generated: edit `electrical/gen/design.py`, never the `.kicad_sch` files.
+The schematic and the board are generated: edit `electrical/gen/design.py` and the fit
+model, never the `.kicad_sch` or `.kicad_pcb` files.
 Every pin carries a label with its net name instead of drawn wires. `make schematic` runs
 KiCad's rule check and compares the netlist KiCad reads with the one in `design.py`.
 
