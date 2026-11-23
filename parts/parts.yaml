@@ -1,0 +1,126 @@
+# Single source for part bodies, BOM fields and (later) schematic symbols.
+# size: [length along the arc, axial width, height above the board], millimetres.
+# status: verified   = read on a manufacturer page or datasheet
+#         secondary  = distributor, press release or teardown summary
+#         unverified = from memory or an estimate; check before freezing
+parts:
+  soc:
+    function: BLE system-on-chip
+    manufacturer: Nordic Semiconductor
+    mpn: nRF54L15-CAAA
+    package: WLCSP-47, 0.3 mm pitch
+    size: [2.45, 2.25, 0.42]
+    status: verified
+    url: https://docs.nordicsemi.com/r/bundle/ps_nrf54l15/page/keyfeatures_html5.html
+  pmic:
+    function: Charger, 1.8 V buck, load switches, ship mode
+    manufacturer: Nordic Semiconductor
+    mpn: nPM1304-CAAA
+    package: WLCSP-35
+    size: [3.08, 2.38, 0.46]
+    status: verified
+    url: https://docs.nordicsemi.com/r/bundle/ps_npm1304/page/product_overview.html
+  flash:
+    function: 128 Mbit 1.8 V SPI NOR flash
+    manufacturer: Winbond
+    mpn: W25Q128JWYIQ
+    package: WLCSP-21
+    size: [3.3, 2.7, 0.46]
+    status: unverified       # height verified; body not published, estimated from the 2.5 mm ball array
+    url: https://www.winbond.com/hq/product/code-storage-flash-memory/serial-nor-flash/?__locale=en&partNo=W25Q128JW
+  mic:
+    function: PDM MEMS microphone, bottom port
+    manufacturer: TDK InvenSense
+    mpn: T5838
+    package: LGA, bottom port
+    size: [3.5, 2.65, 0.98]
+    status: verified
+    url: https://invensense.tdk.com/products/digital/t5838/
+  button:
+    function: Tactile switch
+    manufacturer: Panasonic
+    mpn: EVPBB2A9B000
+    package: SMD 2.6 x 1.6
+    size: [2.6, 1.6, 0.55]
+    status: secondary
+    url: https://na.industrial.panasonic.com/products/switches-encoders-interface-devices/switches/series/79137
+  led:
+    function: Recording indicator
+    manufacturer: Rohm
+    mpn: SML-P11VT
+    package: "0402"
+    size: [1.0, 0.6, 0.2]
+    status: verified
+    url: https://fscdn.rohm.com/en/products/databook/datasheet/opto/led/chip_mono/sml-p11-e.pdf
+  xtal32m:
+    function: 32 MHz crystal
+    manufacturer: Kyocera
+    mpn: CX1612DB32000D0WZRC3
+    package: "1612"
+    size: [1.6, 1.2, 0.35]
+    status: secondary        # part from Nordic's reference list; height not checked
+    url: ""
+  inductor:
+    function: Buck inductor, 2.2 uH
+    manufacturer: Murata
+    mpn: DFE18SAN2R2 class
+    package: "0603 (1608 metric)"
+    size: [1.6, 0.8, 0.8]
+    status: unverified
+    url: ""
+  protector:
+    function: Cell protection
+    manufacturer: ABLIC
+    mpn: S-82A1A
+    package: DFN-6 1.4 x 1.4
+    size: [1.4, 1.4, 0.5]
+    status: secondary        # body verified, height not extracted
+    url: https://www.ablic.com/en/doc/datasheet/battery_protection/S82A1A_E.pdf
+  antenna:
+    function: 2.4 GHz chip antenna
+    manufacturer: to choose
+    mpn: to choose
+    package: "1608 chip antenna"
+    size: [1.6, 0.8, 0.4]
+    status: unverified
+    url: ""
+  passive0201:
+    function: Resistor or capacitor
+    manufacturer: generic
+    mpn: "0201"
+    package: "0201"
+    size: [0.6, 0.3, 0.3]
+    status: verified
+    url: ""
+  passive0402:
+    function: Bulk capacitor
+    manufacturer: generic
+    mpn: "0402"
+    package: "0402"
+    size: [1.0, 0.5, 0.55]
+    status: verified
+    url: ""
+
+# Curved lithium-polymer cells. size: [arc length, axial width, thickness].
+cells:
+  grp160626:
+    manufacturer: Grepow
+    mpn: GRP160626
+    size: [26.0, 6.0, 1.6]
+    capacity_mah: 15.5
+    status: verified
+    url: https://www.grepow.com/wearables/smart-ring.html
+  grp1707_22:
+    manufacturer: Grepow
+    mpn: GRP1707xx, 22 mm (exact code to confirm)
+    size: [22.0, 6.5, 1.7]
+    capacity_mah: 14.5
+    status: secondary
+    url: https://www.grepow.com/wearables/smart-ring.html
+  grp1707_29:
+    manufacturer: Grepow
+    mpn: GRP1707xx, 29 mm (exact code to confirm)
+    size: [29.0, 6.5, 1.7]
+    capacity_mah: 21.5
+    status: secondary
+    url: https://www.grepow.com/wearables/smart-ring.html

@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+electrical/kicad/*-backups/
+electrical/kicad/*.lck
+electrical/kicad/fp-info-cache
+mechanical/out/*.step
+electrical/kicad/*.kicad_prl
+electrical/out/erc.json
+electrical/out/netlist.xml

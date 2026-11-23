@@ -1,0 +1,17 @@
+[project]
+name = "manent-ring"
+version = "0.1.0"
+description = "Hardware design of the Manent ring: parts, schematic generator, mechanical fit model"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "build123d>=0.9",
+    "pyyaml>=6",
+    "numpy>=1.26",
+]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["mechanical", "electrical", "."]

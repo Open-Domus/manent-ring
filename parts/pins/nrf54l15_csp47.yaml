@@ -1,0 +1,60 @@
+# nRF54L15 CSP47 (CAAA) ball map.
+# Source: Nordic product specification, "Pin assignments", CSP47, cross-checked ball by
+# ball against the symbol in Nordic's CAAA reference layout 0.7.
+# https://docs.nordicsemi.com/r/bundle/ps_nrf54l15/page/chapters/pin.html-csp47
+# Grid 7 x 7, positions B2 and C1 unpopulated. ck: clock-capable pin.
+status: verified
+pins:
+  A1: {name: XC1, type: crystal}
+  A2: {name: XC2, type: crystal}
+  A3: {name: P1.12, type: io, ck: true}
+  A4: {name: DECA, type: power}
+  A5: {name: DECD, type: power}
+  A6: {name: VSS, type: ground}
+  A7: {name: DCC, type: power}
+  B1: {name: DECRF, type: power}
+  B3: {name: P1.09, type: io}
+  B4: {name: P1.13, type: io}
+  B5: {name: P1.14, type: io}
+  B6: {name: P1.15, type: io}
+  B7: {name: VDD, type: power}
+  C2: {name: VSS_PA, type: ground}
+  C3: {name: P1.10, type: io}
+  C4: {name: P1.11, type: io, ck: true}
+  C5: {name: P1.00, type: io, alt: XL1}
+  C6: {name: P1.01, type: io, alt: XL2}
+  C7: {name: P1.02, type: io, alt: NFC1}
+  D1: {name: ANT, type: rf}
+  D2: {name: nRESET, type: reset}
+  D3: {name: P0.04, type: io, ck: true}
+  D4: {name: P2.08, type: io}
+  D5: {name: P1.03, type: io, ck: true, alt: NFC2}
+  D6: {name: P1.04, type: io, ck: true}
+  D7: {name: P1.06, type: io}
+  E1: {name: P0.03, type: io, ck: true}
+  E2: {name: P0.02, type: io}
+  E3: {name: SWDCLK, type: debug}
+  E4: {name: P2.07, type: io}
+  E5: {name: P2.03, type: io}
+  E6: {name: P1.05, type: io}
+  E7: {name: P1.07, type: io}
+  F1: {name: P0.01, type: io}
+  F2: {name: SWDIO, type: debug}
+  F3: {name: P2.09, type: io}
+  F4: {name: P2.06, type: io, ck: true}
+  F5: {name: P2.04, type: io}
+  F6: {name: P2.02, type: io}
+  F7: {name: P1.08, type: io, ck: true}
+  G1: {name: P0.00, type: io}
+  G2: {name: P2.10, type: io}
+  G3: {name: VDD, type: power}
+  G4: {name: VSS, type: ground}
+  G5: {name: P2.05, type: io}
+  G6: {name: P2.00, type: io}
+  G7: {name: P2.01, type: io, ck: true}
+# Placement rules that the schematic checks rely on:
+#   - PDM clock, SPI clock and I2C clock must be on a ck pin.
+#   - A peripheral's pins are all on one port. PDM uses port 1. The fast SPI (SPIM00)
+#     uses P2.01 SCK, P2.02 SDO, P2.04 SDI, P2.05 CSN.
+#   - Only ports 0 and 1 can wake the chip from System OFF.
+#   - VDD 1.7-3.6 V, at least 1.75 V during power-on reset.
