@@ -17,8 +17,11 @@ o = ["# Space budget", "",
      "- At least 0.10 of resin around every part.",
      f"- Cell: {S.SWELL:.0%} thickness growth allowed for, plus {S.CELL_GAP} of wrap on each side.",
      f"- Flex {S.FLEX_WIDTH} wide; islands joined by {S.BEND} of bare flex; {S.CELL_TABS} for the cell tabs.",
-     "- The button must land on the thumb side (-15 to 30 degrees), microphone and light on the back",
-     "  of the finger (60 to 120 degrees).", ""]
+     "- Every part in the bill of materials is placed, on one of the two faces of an island, in columns",
+     f"  across the flex, {S.PART_SPACING} apart, with extra room around the fine-pitch packages. This checks that",
+     "  the parts have room; it does not check that the tracks between them can be routed.",
+     f"- The button sits at {S.BUTTON_DEG:.0f} degrees, towards the thumb; microphone and light must land on the back",
+     "  of the finger (60 to 120 degrees). Arc left over lies between the antenna and the far end of the cell.", ""]
 for key, e in rep["envelopes"].items():
     o += [f"## Envelope {e['envelope']}: {e['band_width']} wide, wall {e['wall_edge']} to {e['wall_centre']}", "",
           f"Reference finger: inner diameter {e['inner_diameter']} (US {e['us_size']}), outer diameter {e['outer_diameter']}.",
@@ -45,7 +48,7 @@ o += ["## Ring sizes", "",
 for ra, rb in zip(rep["size_sweep"]["A"], rep["size_sweep"]["B"]):
     f = lambda r: f"{r['best_cell']} ({r['capacity_mah']} mAh)" if r["best_cell"] else "none"
     o.append(f"| {ra['us_size']} | {ra['inner_diameter']} | {rb['max_cell_length']} | {f(ra)} | {f(rb)} |")
-o += ["", "Every millimetre of arc saved in the electronics is a millimetre of cell: shortening the",
-      "islands is the most direct way to more capacity and to sizes below US 7.", ""]
+o += ["", "The largest cell in the catalogue family is 29 long. Where the table shows room for a longer one,",
+      "more capacity needs a cell made to order: roughly 0.74 mAh per millimetre, by proportion.", ""]
 (ROOT / "docs" / "space-budget.md").write_text("\n".join(o))
 print("docs/space-budget.md written")

@@ -125,6 +125,9 @@ The full list with part numbers is `electrical/out/bom.csv`.
   light, and clear only in front of the LED.
 - Openings in the titanium: one hole for the microphone (0.5-1.0 mm in the board under a
   0.375 mm port), one small hole or thinned window for the light, one for the button.
+- Layout: six islands, parts on both faces. Flash sits behind the microcontroller, the small
+  power parts behind the power chip, the cell protection behind the charging pads. This
+  keeps the electronics to about 33 mm of arc and leaves the rest to the cell.
 - Circuit: rigid islands for the fine-pitch chips joined by two-layer flex. The 0.3 mm
   pitch of the microcontroller package needs microvias under the chip; Nordic's own
   reference board is an eight-layer build. This is work for a specialist fabricator and

@@ -43,9 +43,17 @@ def test_button_and_microphone_land_where_the_hand_needs_them(reports):
     assert not reports["B"]["arc"]["problems"]
 
 
-def test_wide_envelope_has_a_cell_from_size_7_up():
-    rows = {r["us_size"]: r for r in size_sweep("B")}
-    assert all(rows[s]["best_cell"] for s in range(7, 14))
+def test_wide_envelope_takes_the_largest_catalogue_cell_from_size_7_up():
+    rows = {r["us_size"]: r["best_cell"] for r in size_sweep("B")}
+    assert all(rows[s] == "grp1707_29" for s in range(7, 14))
+    assert rows[6] is not None
+
+
+def test_every_part_of_the_circuit_is_in_the_model():
+    from gen.design import build
+    wanted = sorted(b for b in map(S.body_of, build()) if b)
+    placed = sorted(pl.part for isl in S.ISLANDS for pl in isl.parts)
+    assert placed == wanted and len(placed) > 50
 
 
 def test_parts_are_complete():

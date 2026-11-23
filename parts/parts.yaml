@@ -84,6 +84,22 @@ parts:
     size: [1.6, 0.8, 0.4]
     status: unverified
     url: ""
+  nfet:
+    function: Small N-channel MOSFET
+    manufacturer: to choose
+    mpn: to choose
+    package: "DFN1006 class"
+    size: [1.0, 0.6, 0.4]
+    status: unverified
+    url: ""
+  xtal32k:
+    function: 32.768 kHz crystal (footprint only, not fitted)
+    manufacturer: TXC
+    mpn: 9HT11-32.768KDZC-T
+    package: "2012"
+    size: [2.0, 1.2, 0.6]
+    status: secondary        # part from Nordic's reference list; height not checked
+    url: ""
   passive0201:
     function: Resistor or capacitor
     manufacturer: generic

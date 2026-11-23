@@ -21,9 +21,8 @@ Usable capacity is taken as 80% of the rating.
 
 | Cell | Low draw | Nominal | High draw |
 | --- | --- | --- | --- |
-| 14.5 mAh (US 7-8) | 11.0 h | 7.9 h | 4.9 h |
-| 15.5 mAh (US 9) | 11.7 h | 8.4 h | 5.3 h |
-| 21.5 mAh (US 10+) | 16.2 h | 11.7 h | 7.3 h |
+| 21.5 mAh (US 7 and up) | 16.2 h | 11.7 h | 7.3 h |
+| 14.5 mAh (US 6) | 11.0 h | 7.9 h | 4.9 h |
 
 ## Days between charges
 
@@ -32,17 +31,16 @@ standby at 15 uA (slow advertising).
 
 | Cell | 15 min/day | 30 min/day | 60 min/day |
 | --- | --- | --- | --- |
-| 14.5 mAh (US 7-8) | 15 days | 10 days | 6 days |
-| 15.5 mAh (US 9) | 16 days | 10 days | 6 days |
-| 21.5 mAh (US 10+) | 22 days | 14 days | 8 days |
+| 21.5 mAh (US 7 and up) | 22 days | 14 days | 8 days |
+| 14.5 mAh (US 6) | 15 days | 10 days | 6 days |
 
 ## Standby alone
 
-| State | Current (estimate) | 14.5 mAh cell lasts |
+| State | Current (estimate) | 21.5 mAh cell lasts |
 | --- | --- | --- |
-| slow advertising, 1-2 s interval | 15 uA | 32 days |
-| connected, idle | 20 uA | 24 days |
-| off, button wakes it | 3 uA | 161 days |
+| slow advertising, 1-2 s interval | 15 uA | 48 days |
+| connected, idle | 20 uA | 36 days |
+| off, button wakes it | 3 uA | 239 days |
 
 ## What to measure first
 

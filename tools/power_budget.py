@@ -5,7 +5,7 @@ from pathlib import Path
 V_CELL = 3.8          # nominal cell voltage
 BUCK_EFF = 0.85       # assumed efficiency of the 1.8 V buck at these loads
 USABLE = 0.80         # share of the rated capacity counted on
-CELLS = {"14.5 mAh (US 7-8)": 14.5, "15.5 mAh (US 9)": 15.5, "21.5 mAh (US 10+)": 21.5}
+CELLS = {"21.5 mAh (US 7 and up)": 21.5, "14.5 mAh (US 6)": 14.5}
 
 # (name, low, nominal, high) in milliwatts at the 1.8 V rail unless noted; source
 RECORDING = [
@@ -46,8 +46,8 @@ def main():
     for name, mah in CELLS.items():
         days = [mah * USABLE / (h * (ma[1] + UPLOAD_MAH_PER_RECORDED_HOUR) + idle) for h in (0.25, 0.5, 1.0)]
         out.append(f"| {name} | " + " | ".join(f"{d:.0f} days" for d in days) + " |")
-    out += ["", "## Standby alone", "", "| State | Current (estimate) | 14.5 mAh cell lasts |", "| --- | --- | --- |"]
-    out += [f"| {k} | {v} uA | {14.5 * USABLE / (v * 24 / 1000):.0f} days |" for k, v in STANDBY_UA.items()]
+    out += ["", "## Standby alone", "", "| State | Current (estimate) | 21.5 mAh cell lasts |", "| --- | --- | --- |"]
+    out += [f"| {k} | {v} uA | {21.5 * USABLE / (v * 24 / 1000):.0f} days |" for k, v in STANDBY_UA.items()]
     out += ["", "## What to measure first", "",
             "1. Opus encoder duty cycle on the nRF54L15 at complexity 0: it is the largest term and a guess.",
             "2. PDM and oscillator current while recording.",

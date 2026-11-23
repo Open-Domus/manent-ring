@@ -32,11 +32,12 @@ def plan(key: str) -> str:
             f'<circle r="{ri:.3f}" fill="#fff" stroke="{INK}" stroke-width="0.04"/>\n')
     cell = cell_report(p, parts, ck)
     t = parts["cells"][ck]["size"][2]
-    a0 = S.CELL_CENTRE_DEG - cell["arc_deg"] / 2
+    layout = arc_report(p, parts, ck)
+    a0 = layout["cell_centre_deg"] - cell["arc_deg"] / 2
     arc = [a0 + cell["arc_deg"] * i / 40 for i in range(41)]
     body += _poly([xy(cell["radius"] + t / 2, a) for a in arc]
                   + [xy(cell["radius"] - t / 2, a) for a in reversed(arc)], CELL)
-    for isl, where in zip(S.ISLANDS, arc_report(p, parts, ck)["placed"]):
+    for isl, where in zip(S.ISLANDS, layout["placed"]):
         rp = island_report(p, parts, isl)["plane_radius"] or p.mean_radius
         c, s = math.cos(math.radians(where["centre_deg"])), math.sin(math.radians(where["centre_deg"]))
         for x0, x1, _, _, z0, z1, is_part in _boxes(parts, isl):
@@ -46,7 +47,7 @@ def plan(key: str) -> str:
         lx, ly = xy(ro + 1.6, where["centre_deg"])
         body += (f'<text x="{lx:.2f}" y="{ly:.2f}" font-size="0.9" text-anchor="middle" '
                  f'dominant-baseline="middle">{isl.name}</text>\n')
-    lx, ly = xy(ro + 1.6, S.CELL_CENTRE_DEG)
+    lx, ly = xy(ro + 1.6, layout["cell_centre_deg"])
     body += f'<text x="{lx:.2f}" y="{ly:.2f}" font-size="0.9" text-anchor="middle">cell</text>\n'
     m = ro + 4.2
     return _svg(body, (-m, -m, 2 * m, 2 * m), 640)

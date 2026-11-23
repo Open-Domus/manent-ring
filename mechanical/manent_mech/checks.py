@@ -7,8 +7,10 @@ from . import stack as S
 from .params import ENVELOPES, RingParams
 from .profile import cavity_height, in_cavity, sdf
 
-PART_SPACING = 0.15     # minimum distance between two parts on the same face
-EDGE_MARGIN = 0.10      # minimum distance from a part to the island edge
+
+
+EDGE = S.EDGE_MARGIN - 1e-6        # the packer places parts exactly at these limits
+SPACING = S.PART_SPACING - 1e-6
 
 
 def _size(parts, pl):
@@ -68,13 +70,13 @@ def island_report(p: RingParams, parts, isl) -> dict:
     for pl in isl.parts:
         l, w, _ = _size(parts, pl)
         r = (pl.x - l / 2, pl.x + l / 2, pl.y - w / 2, pl.y + w / 2, pl.face, pl.part)
-        if (r[0] < -isl.length / 2 + EDGE_MARGIN or r[1] > isl.length / 2 - EDGE_MARGIN
-                or r[2] < -S.FLEX_WIDTH / 2 + EDGE_MARGIN or r[3] > S.FLEX_WIDTH / 2 - EDGE_MARGIN):
+        if (r[0] < -isl.length / 2 + EDGE or r[1] > isl.length / 2 - EDGE
+                or r[2] < -S.FLEX_WIDTH / 2 + EDGE or r[3] > S.FLEX_WIDTH / 2 - EDGE):
             problems.append(f"{pl.part} overhangs the island")
         rects.append(r)
     for a, b in combinations(rects, 2):
-        if a[4] == b[4] and (a[0] < b[1] + PART_SPACING and b[0] < a[1] + PART_SPACING
-                             and a[2] < b[3] + PART_SPACING and b[2] < a[3] + PART_SPACING):
+        if a[4] == b[4] and (a[0] < b[1] + SPACING and b[0] < a[1] + SPACING
+                             and a[2] < b[3] + SPACING and b[2] < a[3] + SPACING):
             problems.append(f"{a[5]} and {b[5]} overlap")
     stack_h = isl.thickness + sum(
         max((_size(parts, pl)[2] + S.SOLDER for pl in isl.parts if pl.face == f), default=0.0)
@@ -108,26 +110,29 @@ def cell_report(p: RingParams, parts, key: str) -> dict:
             "ok": lo >= S.CELL_GAP}
 
 
-def arc_report(p: RingParams, parts, cell_key: str, cell_centre_deg: float = S.CELL_CENTRE_DEG) -> dict:
+def arc_report(p: RingParams, parts, cell_key: str) -> dict:
+    """Lay the islands along the arc after the cell tabs, with the button at BUTTON_DEG;
+    whatever arc is left over sits between the last island and the far end of the cell."""
     cell = cell_report(p, parts, cell_key)
     r = p.mean_radius
-    half = cell["arc_deg"] / 2
-    ang = cell_centre_deg + half - 360.0
     mm = lambda length: math.degrees(length / r)
-    ang += mm(S.CELL_TABS)
-    placed, problems = [], []
+    ang, centres = mm(S.CELL_TABS), {}
     for isl in S.ISLANDS:
         ang += mm(S.BEND)
-        centre = ang + mm(isl.length) / 2
+        centres[isl.name] = ang + mm(isl.length) / 2
+        ang += mm(isl.length)
+    ang += mm(S.BEND)
+    start = S.BUTTON_DEG - centres["button"]            # angle of the tab end of the cell
+    slack_mm = math.radians(360.0 - cell["arc_deg"] - ang) * r - S.CLOSING_GAP
+    placed, problems = [], []
+    for isl in S.ISLANDS:
+        centre = start + centres[isl.name]
         placed.append({"island": isl.name, "centre_deg": round(centre, 1)})
         if isl.target_deg and not isl.target_deg[0] <= centre <= isl.target_deg[1]:
             problems.append(f"{isl.name} at {centre:.0f} deg, wanted {isl.target_deg}")
-        ang += mm(isl.length)
-    ang += mm(S.BEND)
-    end = cell_centre_deg - half
-    slack_mm = math.radians(end - ang) * r - S.CLOSING_GAP
     used = S.CELL_TABS + sum(i.length for i in S.ISLANDS) + S.BEND * (len(S.ISLANDS) + 1)
     return {"electronics_mm": round(used, 2), "cell_arc_deg": cell["arc_deg"],
+            "cell_centre_deg": round(start - cell["arc_deg"] / 2, 1),
             "slack_mm": round(slack_mm, 2), "placed": placed,
             "ok": slack_mm >= 0 and not problems, "problems": problems}
 

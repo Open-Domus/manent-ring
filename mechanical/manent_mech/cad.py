@@ -41,7 +41,7 @@ def build(key: str) -> Compound:
     cell = cell_report(p, parts, ck)
     length, width, thick = parts["cells"][ck]["size"]
     rect = [(-thick / 2, -width / 2), (thick / 2, -width / 2), (thick / 2, width / 2), (-thick / 2, width / 2)]
-    body = Rot(0, 0, S.CELL_CENTRE_DEG - cell["arc_deg"] / 2) * _revolved(rect, cell["radius"], cell["arc_deg"])
+    body = Rot(0, 0, arc["cell_centre_deg"] - cell["arc_deg"] / 2) * _revolved(rect, cell["radius"], cell["arc_deg"])
     body.label = f"cell {ck}"
     solids.append(body)
     return Compound(label=f"manent-ring-{key}", children=solids)
