@@ -1,6 +1,6 @@
 #!/bin/sh
 # Run KiCad on the generated design: the installed one if present, otherwise the official
-# container (docker pull kicad/kicad:10.0).   tools/kicad.sh schematic | board | route
+# container (docker pull kicad/kicad:10.0).   tools/kicad.sh schematic | board | route | quote
 set -e
 cd "$(dirname "$0")/../electrical"
 mkdir -p out
@@ -26,6 +26,20 @@ board)
     run kicad-cli pcb export svg --mode-single --page-size-mode 2 --exclude-drawing-sheet \
       --layers "$layer,Edge.Cuts,Dwgs.User" -o "../out/board-$layer.svg" manent.kicad_pcb
   done
+  ;;
+quote)
+  # Fabrication files for a quote request, zipped in quote/manent-ring-quote.zip.
+  rm -rf out/quote && mkdir -p out/quote/gerber out/quote/drill
+  run kicad-cli pcb export gerbers --no-protel-ext --subtract-soldermask \
+    --layers F.Cu,In1.Cu,In2.Cu,In3.Cu,In4.Cu,B.Cu,F.Mask,B.Mask,F.Paste,B.Paste,Edge.Cuts,Dwgs.User \
+    -o ../out/quote/gerber/ manent.kicad_pcb
+  run kicad-cli pcb export drill --format excellon --excellon-separate-th --generate-map --map-format pdf \
+    -o ../out/quote/drill/ manent.kicad_pcb
+  run kicad-cli pcb export pos --format csv --units mm --side both -o ../out/quote/positions.csv manent.kicad_pcb
+  cp out/bom.csv out/quote/bom.csv
+  cp ../quote/request.md out/quote/README.md
+  cp kicad/manent.kicad_pcb out/quote/
+  (cd out/quote && rm -f ../../../quote/manent-ring-quote.zip && zip -qr ../../../quote/manent-ring-quote.zip .)
   ;;
 route)
   # Routes from scratch: several minutes. Needs the pad geometry of the placed board.

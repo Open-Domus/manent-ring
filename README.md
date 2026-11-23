@@ -16,7 +16,8 @@ Nothing here has been built or measured. This is a design on paper, checked by s
 | Circuit, as data | [electrical/gen/design.py](electrical/gen/design.py) |
 | Schematic (KiCad 10), PDF, netlist, bill of materials | `electrical/kicad/`, `electrical/out/` |
 | Board: placed and routed (connectivity proof, not a fabrication layout) | `electrical/kicad/manent.kicad_pcb`, `electrical/out/board-*.svg` |
-| Fit model, drawings, STEP | `mechanical/`, `mechanical/out/` |
+| Fit model, drawings, STEP, STL to 3D print | `mechanical/`, `mechanical/out/` |
+| Quote request for a fabricator | [quote/request.md](quote/request.md); `make quote` builds the zip to send |
 
 ## Build
 

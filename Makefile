@@ -1,4 +1,4 @@
-.PHONY: all test fit cad drawings power schematic board route clean
+.PHONY: all test fit cad drawings power schematic board route quote clean
 
 all: schematic board test fit drawings power cad
 
@@ -31,6 +31,10 @@ board:
 route:
 	uv run python -m electrical.gen.board
 	tools/kicad.sh route
+
+# Fabrication files and the request text, zipped for a fabricator.
+quote: board
+	tools/kicad.sh quote
 
 clean:
 	rm -f mechanical/out/*.step mechanical/out/*.svg mechanical/out/fit-report.json

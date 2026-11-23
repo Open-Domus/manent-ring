@@ -12,3 +12,6 @@ electrical/out/netlist.xml
 electrical/out/drc.json
 electrical/out/board.json
 electrical/out/pads.json
+electrical/out/quote/
+quote/*.zip
+mechanical/out/*.stl
