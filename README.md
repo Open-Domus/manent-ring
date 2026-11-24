@@ -4,6 +4,8 @@ Hardware design of the Manent ring: a ring with one button that records what you
 and hands it to your phone over Bluetooth LE. Firmware and radio protocol live in the
 `mnemo-band` repository; the public description is the `manent-site` repository.
 
+Public page: [manentlabs.it/en/](https://manentlabs.it/en/) (English), [manentlabs.it/](https://manentlabs.it/) (Italian).
+
 Nothing here has been built or measured. This is a design on paper, checked by scripts.
 
 | What | Where |
