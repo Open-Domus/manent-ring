@@ -24,6 +24,8 @@ o = ["# Space budget", "",
      "- Every part in the bill of materials is placed, on one of the two faces of an island, in columns",
      f"  across the flex, {S.PART_SPACING} apart, with extra room around the fine-pitch packages. This checks that",
      "  the parts have room; it does not check that the tracks between them can be routed.",
+     f"- Charging and service contacts: a slug on each pad, {S.SLUG_D['Pad_Charge_D1.5']} or {S.SLUG_D['Pad_Service_D0.8']} across, comes up to the inner",
+     f"  surface and stays {S.SLUG_LIP} or more from the titanium. A steel keeper sits {0.10:.2f} above the parts of that island.",
      f"- The button sits at {S.BUTTON_DEG:.0f} degrees, towards the thumb; microphone and light must land on the back",
      "  of the finger (60 to 120 degrees). Arc left over lies between the antenna and the far end of the cell.", ""]
 for key, e in rep["envelopes"].items():
@@ -41,6 +43,11 @@ for key, e in rep["envelopes"].items():
               f"Room left on each side after swelling: {c['clearance']:.2f} "
               f"({'enough' if c['ok'] else 'less than the ' + str(S.CELL_GAP) + ' required'}). It spans {c['arc_deg']} degrees.",
           f"- **Arc**: electronics take {a['electronics_mm']} of arc; {a['slack_mm']:+.1f} is left over.",
+          f"- **Contacts**: slugs {e['contacts']['shortest']:.2f} to {e['contacts']['tallest']:.2f} tall from pad to inner surface, "
+          f"{e['contacts']['closest_to_titanium']:.2f} from the titanium, {e['contacts']['closest_pair']:.2f} from each other. "
+          f"The steel keeper ({' x '.join(str(v) for v in e['contacts']['keeper']['size'])}) keeps "
+          f"{e['contacts']['keeper']['resin_to_shell']:.2f} of resin to the shell"
+          f"{'' if e['contacts']['ok'] else ' (**fails**)'}.",
           f"- **Mass** (estimate): titanium {m['titanium_g']} g, total about {m['total_g_estimate']} g.",
           f"- Drawings: [plan](../mechanical/out/plan-{key}.svg), "
           f"[audio island section](../mechanical/out/section-{key}-audio.svg), "

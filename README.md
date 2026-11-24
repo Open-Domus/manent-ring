@@ -11,11 +11,13 @@ Nothing here has been built or measured. This is a design on paper, checked by s
 | Design document: requirements, architecture, decisions | [docs/design.md](docs/design.md) |
 | Does it fit? Envelope, islands, cell, ring sizes | [docs/space-budget.md](docs/space-budget.md) |
 | How long does it last? | [docs/power-budget.md](docs/power-budget.md) |
+| How does it charge? Contacts, dock, why not wireless | [docs/charging.md](docs/charging.md) |
 | What is unknown, and what would settle it | [docs/open-questions.md](docs/open-questions.md) |
 | Parts with sizes and how far each is verified | [parts/parts.yaml](parts/parts.yaml) |
 | Circuit, as data | [electrical/gen/design.py](electrical/gen/design.py) |
 | Schematic (KiCad 10), PDF, netlist, bill of materials | `electrical/kicad/`, `electrical/out/` |
 | Board: placed and routed (connectivity proof, not a fabrication layout) | `electrical/kicad/manent.kicad_pcb`, `electrical/out/board-*.svg` |
+| Charging dock, one printable body per ring size | `mechanical/manent_mech/dock.py`, `mechanical/out/print-dock-*.stl` |
 | Fit model, drawings, STEP, STL to 3D print | `mechanical/`, `mechanical/out/` |
 | Quote request for a fabricator | [quote/request.md](quote/request.md); `make quote` builds the zip to send |
 

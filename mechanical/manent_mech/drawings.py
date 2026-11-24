@@ -2,11 +2,12 @@
 import math
 
 from . import stack as S
-from .checks import _boxes, arc_report, best_cell, cell_report, island_report
+from .checks import _boxes, arc_report, best_cell, cell_report, contacts_report, island_report
 from .params import ENVELOPES
 from .profile import outline, shell_outline
 
 INK, TI, RESIN, BOARD, PART, CELL = "#222", "#b9b2a6", "#f1ead9", "#3d7a4f", "#33475b", "#c2603c"
+GOLD, STEEL = "#d9a520", "#7d8790"
 
 
 def _svg(body, box, width):
@@ -64,6 +65,13 @@ def section(key: str, island_name: str) -> str:
     for _, _, y0, y1, z0, z1, is_part in _boxes(parts, isl):
         body += _poly(flip([(rp + z0, y0), (rp + z1, y0), (rp + z1, y1), (rp + z0, y1)]),
                       PART if is_part else BOARD, sw=0.015)
+    if island_name == "contacts":           # the slugs down to the inner surface, the keeper above the parts
+        con, t = contacts_report(p, parts), isl.thickness / 2
+        for s in con["slugs"]:
+            lo, hi, y0, y1 = rp - t - s["height"], rp - t, s["y"] - s["diameter"] / 2, s["y"] + s["diameter"] / 2
+            body += _poly(flip([(lo, y0), (hi, y0), (hi, y1), (lo, y1)]), GOLD, sw=0.015)
+        _, _, y0, y1, z0, z1 = con["keeper"]["box"]
+        body += _poly(flip([(rp + z0, y0), (rp + z1, y0), (rp + z1, y1), (rp + z0, y1)]), STEEL, sw=0.015)
     body += (f'<text x="0" y="{p.half_wall + p.crown + 0.7:.2f}" font-size="0.45" '
              f'text-anchor="middle">{p.name}: {isl.name} island (finger side down)</text>\n')
     m = p.half_width + 0.6

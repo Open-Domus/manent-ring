@@ -5,7 +5,7 @@ from itertools import combinations
 
 from . import stack as S
 from .params import ENVELOPES, RingParams
-from .profile import cavity_height, in_cavity, in_titanium, sdf
+from .profile import cavity_height, half_wall_at, in_cavity, in_titanium, inner_window, sdf
 
 
 
@@ -194,6 +194,49 @@ def max_cell_length(p: RingParams, parts, cell_key: str) -> float:
     return free * cell["radius"] / p.mean_radius
 
 
+def contacts_report(p: RingParams, parts) -> dict:
+    """The charging and service contacts: how tall each slug is from its pad to the inner
+    surface, how far it stays from the titanium, and whether the steel keeper fits above the
+    parts on the other face."""
+    from electrical.gen.board import layout
+    board = layout()
+    isl = next(i for i in S.ISLANDS if i.name == "contacts")
+    zone = next(z for z in board["zones"] if z["name"] == "contacts")
+    cx, t = (zone["x0"] + zone["x1"]) / 2, isl.thickness / 2
+    r = island_report(p, parts, isl)["plane_radius"]
+    slugs = []
+    for part in board["parts"]:
+        d = S.SLUG_D.get(part["footprint"])
+        if d is None:
+            continue
+        x, y = part["x"] - cx, part["y"]
+        # the pad is on the face towards the finger; the inner surface is crowned across the band
+        height = math.hypot(x, r - t) - p.mean_radius + half_wall_at(p, y)
+        slugs.append({"pad": part["value"], "net": part["nets"]["1"], "x": round(x, 2), "y": round(y, 2),
+                      "diameter": d, "height": round(height, 3),
+                      "to_titanium": round(inner_window(p) - abs(y) - d / 2, 3)})
+    gaps = [math.dist((a["x"], a["y"]), (b["x"], b["y"])) - (a["diameter"] + b["diameter"]) / 2
+            for a, b in combinations(slugs, 2)]
+    kl, kw, kt = S.KEEPER
+    top = max(b[5] for b in _boxes(parts, isl)) + p.gap           # resin between the parts and the plate
+    row = next(s["x"] for s in slugs if s["net"] == "VBUS")       # the charging contacts share one x
+    keeper = [(row - kl / 2, row + kl / 2, -kw / 2, kw / 2, top, top + kt, True)]
+    lo, hi = -0.6, 1.0
+    for _ in range(12):                                           # resin left around the plate, at this depth
+        m = (lo + hi) / 2
+        lo, hi = (m, hi) if _fits(p, keeper, r, m) else (lo, m)
+    return {"slugs": slugs, "tallest": max(s["height"] for s in slugs), "shortest": min(s["height"] for s in slugs),
+            "closest_to_titanium": min(s["to_titanium"] for s in slugs), "closest_pair": round(min(gaps), 3),
+            "row_x": row, "plane_radius": r,
+            "keeper": {"size": list(S.KEEPER), "box": [round(v, 3) for v in keeper[0][:6]],
+                       "behind_surface": round(top + t + max(s["height"] for s in slugs), 2),
+                       "past_island": round(max(0.0, kl / 2 - row - isl.length / 2, kl / 2 + row - isl.length / 2), 2),
+                       "resin_to_shell": round(lo, 3),
+                       "mass_g": round(kl * kw * kt * 7.8e-3, 3)},
+            "ok": min(s["to_titanium"] for s in slugs) >= S.SLUG_LIP and min(s["height"] for s in slugs) > 0
+                  and lo >= p.gap}
+
+
 def mass_report(p: RingParams) -> dict:
     """Titanium and filling volumes by integrating the cross-section around the axis."""
     n, ti, fill = 240, 0.0, 0.0
@@ -240,7 +283,9 @@ def envelope_report(key: str, us_size: float | None = None, cell_key: str | None
         "inner_diameter": round(p.inner_diameter_min, 2), "outer_diameter": round(p.outer_diameter, 2),
         "cavity_height": {str(w): round(cavity_height(p, w), 2) for w in (4.0, 5.0, 5.6, 6.0, 6.5)},
         "islands": islands, "cell": cell, "arc": arc, "bends": bends, "mass": mass_report(p),
-        "ok": all(i["ok"] for i in islands) and cell["ok"] and arc["ok"] and all(b["ok"] for b in bends),
+        "contacts": (contacts := contacts_report(p, parts)),
+        "ok": all(i["ok"] for i in islands) and cell["ok"] and arc["ok"] and all(b["ok"] for b in bends)
+              and contacts["ok"],
     }
 
 
@@ -318,6 +363,9 @@ if __name__ == "__main__":
         for b in e["bends"]:
             print(f"  bend {b['between']:<20} flex {b['flex']:.1f}  depth step {b['depth_step']:.2f}"
                   f"  fold r/t {b['radius_over_thickness']:.0f}  {'ok' if b['ok'] else 'FAIL'}")
+        k = e["contacts"]
+        print(f"  contacts: slugs {k['shortest']:.2f} to {k['tallest']:.2f} tall, {k['closest_to_titanium']:.2f} from the titanium,"
+              f" {k['closest_pair']:.2f} apart; keeper has {k['keeper']['resin_to_shell']:.2f} of resin  {'ok' if k['ok'] else 'FAIL'}")
         print("  mass:", e["mass"])
     for k, rows in rep["size_sweep"].items():
         print(f"\n== sizes, envelope {k}")

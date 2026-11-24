@@ -7,6 +7,7 @@
 | Is a six-layer any-layer build acceptable in cost? | The routing needs stacked microvias and vias in pads; a simpler build means more layers of thought, or a bigger board | six layers |
 | More capacity than 15.5 mAh? | The 21.5 mAh cell misses the swelling allowance by 0.02 mm. It needs a wall 0.05 mm thicker, a cell made to order, or a supplier's figure for swelling below 8 % | 15.5 mAh, sizes US 8 to 13 (decided 2026-11-23) |
 | Is "about 0.1 mA, wearer only" bright enough outdoors? | It sets a fifth of the recording budget if raised to 0.3 mA | 0.1 mA |
+| Solid gold for the five contact slugs? | It is the only material found that solders, is safe on skin and survives grinding flush. It adds a few euros and a precious metal to the bill of materials | 18 kt yellow gold; 316L stainless as fallback |
 | Licence for the scripts | Not covered by the hardware or document licences | undecided |
 
 ## To confirm from documents
@@ -17,13 +18,16 @@
 | W25Q128JW WLCSP body size; availability of the special-order package | Winbond |
 | Flash /WP and /HOLD termination in single-bit SPI | Winbond |
 | nRF54L15 land pad diameter; nPM1304 ball pitch direction; S-82A1A pin order; 32 MHz crystal land pattern | manufacturers' package drawings |
+| Cell: height of the tab joint, which the steel keeper overhangs by 1.0 mm | supplier's drawing |
 | Cell: exact part codes, curvature per ring size, built-in protection, minimum order | quote from Grepow and one other supplier |
 | N-MOSFETs for the light and the protection; 2.2 uH inductor under 0.8 mm tall | distributor search |
 | nRF54L15 errata 100, 103 and 114 against the pins and clocks used here | Nordic errata, revision in stock |
 | 1.8 V rail tolerance: the buck is +/-5 %, the microphone's absolute maximum is 1.98 V, the microcontroller resets below about 1.75 V, the flash needs 1.70 V | datasheets; choose the set point, and check the drop along 0.075 mm tracks |
 | Protector variant against the cell's charge voltage (4.20 or 4.35 V) and the charger's setting | ABLIC selection table, cell datasheet |
 | PDM clock: the microphone wants 768 kHz, the microcontroller's dividers may not give it exactly | Nordic PDM documentation |
-| 5.5 V one-way protection diode in 0201 for the charging input | distributor search |
+| 5.5 V one-way protection diode in 0201 for the charging input. Candidate: Nexperia PESD5V5C1UBSF (0201, one-way); its working voltage and leakage were not read | Nexperia datasheet |
+| nPM1304: that VBUS is never driven from the cell; charge-end current at an 8 mA setting | Nordic product specification |
+| Cell: allowed charge rate (0.5 C assumed) and temperature window | supplier's datasheet |
 | Cell: is the catalogue length measured along the arc or as a chord; inner radius as supplied | supplier's drawing |
 
 ## To measure, no ring needed (development kit and breakouts)
@@ -32,7 +36,13 @@
 2. Whether the calibrated internal 32 kHz oscillator is good enough.
 3. Light: current needed to be seen through resin.
 4. Charging a 15 mAh cell at 8 mA through the power chip; fuel-gauge behaviour.
-5. Delay between a button press and the microcontroller knowing, through the power chip's interrupt.
+5. Gold slug soldered to an ENIG pad: joint strength before and after potting; the same in 316L.
+6. Slugs and resin ground flush, then a week in artificial sweat, docked wet a few times.
+7. Dock and block as printed (`print-dock-*.stl`, `print-block-*.stl`), with magnets and a piece of
+   steel: whether the magnets turn the ring onto the pins through 2.0 mm, within 3 degrees. Do this
+   first: it costs an afternoon and decides the keeper's thickness or a different way to align.
+8. Spring pins: a part with a 1.0 mm body that holds contact at 0.3 mm of travel.
+9. Delay between a button press and the microcontroller knowing, through the power chip's interrupt.
 
 ## To measure on a ring
 
@@ -45,6 +55,6 @@
 ## Not designed yet
 
 A board layout fit for fabrication (the routing in the repository proves connectivity only: see
-the Board section of design.md), the dock, the button cap, the antenna and the clearing of the
-ground plane under it, the contacts that bring the charging pads up to the inner surface, firmware changes (pins, power chip
+the Board section of design.md), the dock's electronics board and the service clip (the dock's body is modelled: charging.md), the button cap, the antenna and the clearing of the
+ground plane under it, firmware changes (pins, power chip
 driver, light, gestures), compliance (radio, potted lithium cell).

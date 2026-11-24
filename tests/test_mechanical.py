@@ -77,3 +77,31 @@ def test_parts_are_complete():
             assert part["status"] in {"verified", "secondary", "unverified"}, key
     used = {pl.part for isl in S.ISLANDS for pl in isl.parts}
     assert used <= set(parts["parts"])
+
+
+def test_charging_contacts_reach_the_surface_clear_of_the_titanium():
+    from manent_mech.checks import contacts_report
+    from manent_mech.params import WIDE
+    parts = S.load_parts()
+    for size in S.SIZES:
+        rep = contacts_report(WIDE.for_size(size), parts)
+        assert rep["ok"], (size, rep)
+        charge = sorted((s["y"], s["net"]) for s in rep["slugs"] if s["pad"].startswith("charge"))
+        # ground, positive, ground in one line across the band: the ring sits on its dock either way round
+        assert [n for _, n in charge] == ["GND", "VBUS", "GND"]
+        assert charge[0][0] == -charge[2][0] and charge[1][0] == 0
+        assert len({s["x"] for s in rep["slugs"] if s["pad"].startswith("charge")}) == 1
+        # a dock pin cannot bridge two contacts, and every slug is thicker than the resin skin it crosses
+        assert rep["closest_pair"] >= 0.5 and rep["shortest"] >= WIDE.t_skin
+
+
+def test_a_dock_can_be_printed_for_every_size():
+    from manent_mech.dock import dock_report
+    from manent_mech.params import WIDE
+    parts = S.load_parts()
+    for size in S.SIZES:
+        rep = dock_report(WIDE.for_size(size), parts)
+        assert rep["ok"], (size, rep)
+        # the three pins sit on the middle of the band, so the ring goes on either way round
+        assert rep["pin_z"][1] == WIDE.half_width and rep["pin_z"][0] + rep["pin_z"][2] == pytest.approx(WIDE.band_width)
+        assert rep["pin_pressed_by"] > 0 and rep["turn_tolerance_deg"] >= 2.5

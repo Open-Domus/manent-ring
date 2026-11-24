@@ -20,7 +20,7 @@ there. The ring keeps a recording only until the phone confirms it has it.
 | Digital MEMS microphone, 16 kHz mono, Opus at about 16 kbit/s encoded on the ring | product site, `mnemo-band` |
 | Bluetooth LE; store and forward; no server of ours | product site, `mnemo-band` |
 | Firmware the owner can rebuild and load | product site |
-| Rechargeable; three magnetic charging contacts on the inner face | product site |
+| Rechargeable; three magnetic charging contacts on the inner face | product site; method confirmed 2026-11-24, see [charging.md](charging.md) |
 | Outer case in metal, titanium preferred | product site |
 | Band 8.0 mm wide, wall 2.6 mm at the edges and 3.0 mm at the centre | decided 2026-11-23, from the space budget |
 | Ring sizes US 8 to 13 | decided 2026-11-23: below 8 the cell does not fit the arc left by the electronics |
@@ -115,7 +115,9 @@ The full list with part numbers is `electrical/out/bom.csv`.
 - **Thermistor on the cell.** A 10 k thermistor next to the cell tabs lets the charger stop
   outside the cell's temperature range.
 - **Three charging pads, ground-positive-ground.** The ring can sit in its dock either way
-  round without reversing polarity, so no series diode is needed. Magnets go in the dock.
+  round without reversing polarity, so no series diode is needed. Magnets go in the dock, a
+  steel plate for them to hold goes in the ring. Why contacts and not wireless charging, the
+  slugs, the dock and the charger settings are in [charging.md](charging.md).
 - **Two service pads on the inner face** (SWDIO, SWDCLK). Once potted, the ring can still
   be reprogrammed from outside; 100 ohm in series protects the pins. A longer tail with
   reset, serial port and supplies is used for the factory test and cut off before potting.
@@ -134,9 +136,10 @@ The full list with part numbers is `electrical/out/bom.csv`.
   and clear only in front of the LED.
 - Openings in the titanium: one hole for the microphone (a 0.6 mm hole in the board under
   the port), one small hole or thinned window for the light, one for the button.
-- The charging pads are on the board, 0.35 mm or more below the inner surface. Something
-  must bring them to the surface: metal slugs soldered to the pads and ground flush with the
-  resin, most likely. Not designed yet.
+- The charging and service pads are on the board, 0.45 to 0.51 mm below the inner surface.
+  A slug soldered to each one is ground flush with the resin after potting; a steel plate
+  above the same island gives the dock's magnets a hold. Sizes, material, the checks and
+  the dock are in [charging.md](charging.md).
 - Layout: seven islands, parts on both faces, in this order from the cell tabs: charging
   contacts and cell protection, button, power, microcontroller, microphone and light,
   flash, antenna. The electronics take about 38 mm of arc and leave the rest to the cell.
@@ -231,6 +234,7 @@ poor at 2 Mbit/s the firmware can fall back to 1 Mbit/s.
 | Product | What it shows |
 | --- | --- |
 | Pebble Index 01 | The same idea, a button and a microphone in a ring, solved with non-rechargeable cells and five minutes of storage. Charging and a curved cell are what they chose to avoid |
+| Amazon Echo Loop | A ring with a microphone charged through three contacts; the charger is trivial, the problems are wear and mechanics |
 | Oura, Ultrahuman, Galaxy Ring | 7.0-8.1 mm wide, 2.5-2.9 mm thick, 15-22 mAh, resin towards the finger |
 | Omi | The T5838 microphone and its wake-on-sound driver, used by `mnemo-band` |
 

@@ -6,7 +6,7 @@ V_CELL = 3.8          # nominal cell voltage
 BUCK_EFF = 0.85       # assumed efficiency of the 1.8 V buck at these loads
 USABLE = 0.80         # share of the rated capacity counted on
 # The cell the fit model accepts, and the larger one it rejects by a hair (see space-budget.md).
-CELLS = {"15.5 mAh (the cell that fits, US 7 to 13)": 15.5, "21.5 mAh (if the wider cell can be used)": 21.5}
+CELLS = {"15.5 mAh (the cell that fits, US 8 to 13)": 15.5, "21.5 mAh (if the wider cell can be used)": 21.5}
 
 # (name, low, nominal, high) in milliwatts at the 1.8 V rail; source
 RECORDING = [
@@ -18,6 +18,13 @@ RECORDING = [
 LED_MA = (0.05, 0.1, 0.3)     # taken straight from the cell, so not through the converter
 UPLOAD_MAH_PER_RECORDED_HOUR = 0.19   # 7.2 MB at an assumed 400 kbit/s
 STANDBY_UA = {"slow advertising, 1-2 s interval": 15, "connected, idle": 20, "off, button wakes it": 3}
+
+
+# Charging through the contacts: the power chip is a linear charger fed at 5 V (docs/charging.md).
+V_DOCK = 5.0
+CHARGE_C = (0.5, 1.0)         # charge rates considered; the cell's datasheet decides
+CHARGE_STEP_MA = 0.5          # the power chip sets the current in these steps, from 4 mA up
+TAPER = 1.3                   # time for a full charge over capacity / current: assumption for the constant-voltage tail
 
 
 def recording_ma(col):
@@ -50,6 +57,19 @@ def main():
         out.append(f"| {name} | " + " | ".join(f"{d:.0f} days" for d in days) + " |")
     out += ["", "## Standby alone", "", "| State | Current (estimate) | 15.5 mAh cell lasts |", "| --- | --- | --- |"]
     out += [f"| {k} | {v} uA | {15.5 * USABLE / (v * 24 / 1000):.0f} days |" for k, v in STANDBY_UA.items()]
+    out += ["", "## Charging", "",
+            f"From the dock at {V_DOCK:.0f} V through the three contacts. The charger is linear, so what it does not put",
+            "in the cell it turns into heat inside the ring: the dock voltage less the cell voltage, times the current.",
+            f"A full charge is taken as {TAPER} times capacity over current (assumption for the constant-voltage tail).", "",
+            "| Cell | Rate | Current set | Empty to full | Heat in the ring |", "| --- | --- | --- | --- | --- |"]
+    for name, mah in CELLS.items():
+        for c in CHARGE_C:
+            i = round(mah * c / CHARGE_STEP_MA) * CHARGE_STEP_MA
+            out.append(f"| {name.split(' (')[0]} | {c} C | {i:.1f} mA | {mah / i * TAPER:.1f} h | "
+                       f"{(V_DOCK - V_CELL) * i:.0f} mW |")
+    out += ["", "0.5 C is the assumption until the cell's datasheet gives its charge rate. Whether tens of milliwatts",
+            "warm a potted ring enough to matter is a measurement. A wireless receiver would feed this same charger",
+            "and add its own losses on top (see [charging.md](charging.md))."]
     out += ["", "Not counted: the quiescent current of the power chip and of the cell protector (a few",
             "microamps together), radio activity while recording, flash reads during upload, and the",
             "cell's own self-discharge, which over months is of the same order as the standby figures.",

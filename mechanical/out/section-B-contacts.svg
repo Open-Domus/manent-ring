@@ -14,5 +14,11 @@
 <polygon points="0.325,0.570 0.325,0.220 0.925,0.220 0.925,0.570" fill="#33475b" stroke="#222" stroke-width="0.015"/>
 <polygon points="1.575,0.570 1.575,0.220 2.175,0.220 2.175,0.570" fill="#33475b" stroke="#222" stroke-width="0.015"/>
 <polygon points="-0.300,0.570 -0.300,0.220 0.300,0.220 0.300,0.570" fill="#33475b" stroke="#222" stroke-width="0.015"/>
+<polygon points="-0.700,1.519 -0.700,1.020 0.700,1.020 0.700,1.519" fill="#d9a520" stroke="#222" stroke-width="0.015"/>
+<polygon points="1.200,1.474 1.200,1.020 2.600,1.020 2.600,1.474" fill="#d9a520" stroke="#222" stroke-width="0.015"/>
+<polygon points="-2.600,1.474 -2.600,1.020 -1.200,1.020 -1.200,1.474" fill="#d9a520" stroke="#222" stroke-width="0.015"/>
+<polygon points="-1.300,1.534 -1.300,1.020 -0.700,1.020 -0.700,1.534" fill="#d9a520" stroke="#222" stroke-width="0.015"/>
+<polygon points="0.700,1.534 0.700,1.020 1.300,1.020 1.300,1.534" fill="#d9a520" stroke="#222" stroke-width="0.015"/>
+<polygon points="-2.300,-0.080 -2.300,-0.380 2.300,-0.380 2.300,-0.080" fill="#7d8790" stroke="#222" stroke-width="0.015"/>
 <text x="0" y="2.20" font-size="0.45" text-anchor="middle">B-8.0: contacts island (finger side down)</text>
 </svg>

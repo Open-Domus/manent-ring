@@ -21,7 +21,7 @@ Usable capacity is taken as 80% of the rating.
 
 | Cell | Low draw | Nominal | High draw |
 | --- | --- | --- | --- |
-| 15.5 mAh (the cell that fits, US 7 to 13) | 11.8 h | 8.5 h | 5.4 h |
+| 15.5 mAh (the cell that fits, US 8 to 13) | 11.8 h | 8.5 h | 5.4 h |
 | 21.5 mAh (if the wider cell can be used) | 16.4 h | 11.8 h | 7.5 h |
 
 ## Days between charges
@@ -31,7 +31,7 @@ standby at 15 uA (slow advertising).
 
 | Cell | 15 min/day | 30 min/day | 60 min/day |
 | --- | --- | --- | --- |
-| 15.5 mAh (the cell that fits, US 7 to 13) | 16 days | 10 days | 6 days |
+| 15.5 mAh (the cell that fits, US 8 to 13) | 16 days | 10 days | 6 days |
 | 21.5 mAh (if the wider cell can be used) | 22 days | 15 days | 9 days |
 
 ## Standby alone
@@ -41,6 +41,23 @@ standby at 15 uA (slow advertising).
 | slow advertising, 1-2 s interval | 15 uA | 34 days |
 | connected, idle | 20 uA | 26 days |
 | off, button wakes it | 3 uA | 172 days |
+
+## Charging
+
+From the dock at 5 V through the three contacts. The charger is linear, so what it does not put
+in the cell it turns into heat inside the ring: the dock voltage less the cell voltage, times the current.
+A full charge is taken as 1.3 times capacity over current (assumption for the constant-voltage tail).
+
+| Cell | Rate | Current set | Empty to full | Heat in the ring |
+| --- | --- | --- | --- | --- |
+| 15.5 mAh | 0.5 C | 8.0 mA | 2.5 h | 10 mW |
+| 15.5 mAh | 1.0 C | 15.5 mA | 1.3 h | 19 mW |
+| 21.5 mAh | 0.5 C | 11.0 mA | 2.5 h | 13 mW |
+| 21.5 mAh | 1.0 C | 21.5 mA | 1.3 h | 26 mW |
+
+0.5 C is the assumption until the cell's datasheet gives its charge rate. Whether tens of milliwatts
+warm a potted ring enough to matter is a measurement. A wireless receiver would feed this same charger
+and add its own losses on top (see [charging.md](charging.md)).
 
 Not counted: the quiescent current of the power chip and of the cell protector (a few
 microamps together), radio activity while recording, flash reads during upload, and the

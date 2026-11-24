@@ -188,6 +188,81 @@
         "filling_g_estimate": 1.6,
         "total_g_estimate": 3.02
       },
+      "contacts": {
+        "slugs": [
+          {
+            "pad": "charge +",
+            "net": "VBUS",
+            "x": -0.6,
+            "y": 0.0,
+            "diameter": 1.4,
+            "height": 0.564,
+            "to_titanium": 2.1
+          },
+          {
+            "pad": "charge -",
+            "net": "GND",
+            "x": -0.6,
+            "y": 1.9,
+            "diameter": 1.4,
+            "height": 0.49,
+            "to_titanium": 0.2
+          },
+          {
+            "pad": "charge -",
+            "net": "GND",
+            "x": -0.6,
+            "y": -1.9,
+            "diameter": 1.4,
+            "height": 0.49,
+            "to_titanium": 0.2
+          },
+          {
+            "pad": "SWDIO",
+            "net": "SWDIO_PAD",
+            "x": 0.95,
+            "y": -1.0,
+            "diameter": 0.6,
+            "height": 0.571,
+            "to_titanium": 1.5
+          },
+          {
+            "pad": "SWDCLK",
+            "net": "SWDCLK_PAD",
+            "x": 0.95,
+            "y": 1.0,
+            "diameter": 0.6,
+            "height": 0.571,
+            "to_titanium": 1.5
+          }
+        ],
+        "tallest": 0.571,
+        "shortest": 0.49,
+        "closest_to_titanium": 0.2,
+        "closest_pair": 0.5,
+        "row_x": -0.6,
+        "plane_radius": 9.89,
+        "keeper": {
+          "size": [
+            4.2,
+            4.6,
+            0.3
+          ],
+          "box": [
+            -2.7,
+            1.5,
+            -2.3,
+            2.3,
+            0.875,
+            1.175
+          ],
+          "behind_surface": 1.67,
+          "past_island": 1.0,
+          "resin_to_shell": 0.182,
+          "mass_g": 0.045
+        },
+        "ok": false
+      },
       "ok": false
     },
     "B": {
@@ -377,6 +452,81 @@
         "titanium_g": 1.54,
         "filling_g_estimate": 1.82,
         "total_g_estimate": 3.36
+      },
+      "contacts": {
+        "slugs": [
+          {
+            "pad": "charge +",
+            "net": "VBUS",
+            "x": -0.6,
+            "y": 0.0,
+            "diameter": 1.4,
+            "height": 0.499,
+            "to_titanium": 2.4
+          },
+          {
+            "pad": "charge -",
+            "net": "GND",
+            "x": -0.6,
+            "y": 1.9,
+            "diameter": 1.4,
+            "height": 0.454,
+            "to_titanium": 0.5
+          },
+          {
+            "pad": "charge -",
+            "net": "GND",
+            "x": -0.6,
+            "y": -1.9,
+            "diameter": 1.4,
+            "height": 0.454,
+            "to_titanium": 0.5
+          },
+          {
+            "pad": "SWDIO",
+            "net": "SWDIO_PAD",
+            "x": 0.95,
+            "y": -1.0,
+            "diameter": 0.6,
+            "height": 0.514,
+            "to_titanium": 1.8
+          },
+          {
+            "pad": "SWDCLK",
+            "net": "SWDCLK_PAD",
+            "x": 0.95,
+            "y": 1.0,
+            "diameter": 0.6,
+            "height": 0.514,
+            "to_titanium": 1.8
+          }
+        ],
+        "tallest": 0.514,
+        "shortest": 0.454,
+        "closest_to_titanium": 0.5,
+        "closest_pair": 0.5,
+        "row_x": -0.6,
+        "plane_radius": 9.825,
+        "keeper": {
+          "size": [
+            4.2,
+            4.6,
+            0.3
+          ],
+          "box": [
+            -2.7,
+            1.5,
+            -2.3,
+            2.3,
+            0.875,
+            1.175
+          ],
+          "behind_surface": 1.61,
+          "past_island": 1.0,
+          "resin_to_shell": 0.327,
+          "mass_g": 0.045
+        },
+        "ok": true
       },
       "ok": true
     }

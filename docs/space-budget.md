@@ -16,6 +16,8 @@ figures are catalogue values, not a supplier's drawing.
 - Every part in the bill of materials is placed, on one of the two faces of an island, in columns
   across the flex, 0.15 apart, with extra room around the fine-pitch packages. This checks that
   the parts have room; it does not check that the tracks between them can be routed.
+- Charging and service contacts: a slug on each pad, 1.4 or 0.6 across, comes up to the inner
+  surface and stays 0.3 or more from the titanium. A steel keeper sits 0.10 above the parts of that island.
 - The button sits at 25 degrees, towards the thumb; microphone and light must land on the back
   of the finger (60 to 120 degrees). Arc left over lies between the antenna and the far end of the cell.
 
@@ -38,6 +40,7 @@ Cavity height available to a centred part, by part width: 4.0 wide: 2.05, 5.0 wi
 
 - **Cell**: GRP160626, 26.0 x 6.0 x 1.6, 15.5 mAh. Room left on each side after swelling: -0.01 (less than the 0.05 required). It spans 140.5 degrees.
 - **Arc**: electronics take 38.74 of arc; +0.9 is left over.
+- **Contacts**: slugs 0.49 to 0.57 tall from pad to inner surface, 0.20 from the titanium, 0.50 from each other. The steel keeper (4.2 x 4.6 x 0.3) keeps 0.18 of resin to the shell (**fails**).
 - **Mass** (estimate): titanium 1.41 g, total about 3.02 g.
 - Drawings: [plan](../mechanical/out/plan-A.svg), [audio island section](../mechanical/out/section-A-audio.svg), [SoC island section](../mechanical/out/section-A-soc.svg).
 
@@ -60,6 +63,7 @@ Cavity height available to a centred part, by part width: 4.0 wide: 2.15, 5.0 wi
 
 - **Cell**: GRP160626, 26.0 x 6.0 x 1.6, 15.5 mAh. Room left on each side after swelling: 0.15 (enough). It spans 140.6 degrees.
 - **Arc**: electronics take 38.58 of arc; +1.1 is left over.
+- **Contacts**: slugs 0.45 to 0.51 tall from pad to inner surface, 0.50 from the titanium, 0.50 from each other. The steel keeper (4.2 x 4.6 x 0.3) keeps 0.33 of resin to the shell.
 - **Mass** (estimate): titanium 1.54 g, total about 3.36 g.
 - Drawings: [plan](../mechanical/out/plan-B.svg), [audio island section](../mechanical/out/section-B-audio.svg), [SoC island section](../mechanical/out/section-B-soc.svg).
 
