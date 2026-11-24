@@ -20,7 +20,7 @@ there. The ring keeps a recording only until the phone confirms it has it.
 | Digital MEMS microphone, 16 kHz mono, Opus at about 16 kbit/s encoded on the ring | product site, `mnemo-band` |
 | Bluetooth LE; store and forward; no server of ours | product site, `mnemo-band` |
 | Firmware the owner can rebuild and load | product site |
-| Rechargeable; two magnetic charging contacts on the inner face | product site (three pads here, see below) |
+| Rechargeable; three magnetic charging contacts on the inner face | product site |
 | Outer case in metal, titanium preferred | product site |
 | Band 8.0 mm wide, wall 2.6 mm at the edges and 3.0 mm at the centre | decided 2026-11-23, from the space budget |
 | Ring sizes US 8 to 13 | decided 2026-11-23: below 8 the cell does not fit the arc left by the electronics |
