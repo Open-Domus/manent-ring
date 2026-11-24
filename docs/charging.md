@@ -16,7 +16,7 @@ this revision. It can be added later without touching the charger: see the last 
 | Added to the ring | Three metal slugs, one steel plate. No electronic part | Receiver chip 2.28 x 2.56 mm (Rohm ML7670), its matching parts, a coil on the inner face | Coil, matching capacitor, rectifier, clamp, smoothing capacitors |
 | Does it fit | Yes, checked by the model on every size | The chip would. The coil has nowhere to go: every part of the inner face has the cell or a ground plane 0.35 mm behind it, and titanium on both sides | Same coil problem |
 | Charger in the ring | The nPM1304 already there | The same nPM1304: the receiver only supplies its 5 V | The same |
-| Dock | Socket, fuse, three spring pins, two magnets | Transmitter chip (6 x 6 mm), tuned antenna inside a post, a radio product to certify | Oscillator and tuned coil, also a radio product |
+| Dock | Socket, fuse, three sprung contact bars, one magnet | Transmitter chip (6 x 6 mm), tuned antenna inside a post, a radio product to certify | Oscillator and tuned coil, also a radio product |
 | Heat in the ring | 10 to 20 mW (power-budget.md) | The same, plus the receiver's losses: the pair is rated 45 % at best | Unknown |
 | What must be tuned | Nothing | Two antennas against each other, with titanium and a cell beside one of them, for six ring sizes | Same |
 | Weak point | Metal on the skin: corrosion, sealing, wear, alignment | Space and tuning; nothing touches the skin | Same |
@@ -57,8 +57,8 @@ without looking.
   pads, cut 0.7 mm long. After potting the inner face is ground and polished, slugs and
   resin together. They end flush, with nothing for dirt to collect in, and the resin seals
   round them. The model checks height, 0.5 mm of resin to the titanium, and 0.5 mm between
-  neighbours, on every size. The charging slugs are as wide as the pads allow, because their
-  width is the dock's tolerance.
+  neighbours, on every size. The charging slugs are as wide as the pads allow: a bigger target
+  for the dock.
 - **Material.** Grinding removes any plating, so the slug must be right all the way through:
   solderable, harmless on skin, and not corroded by sweat. Proposed: **solid 18 kt yellow
   gold wire**, a jeweller's stock item. Five slugs are about 0.04 g in all, a few euros
@@ -71,49 +71,66 @@ without looking.
   leaks nothing that matters.
 - **Steel keeper.** A plate of soft magnetic steel, 4.2 x 4.6 x 0.3 mm, 0.05 g, sits in the
   resin above the protection parts, 0.1 mm clear of them and 0.33 mm under the titanium. It
-  is centred on the row of contacts, which puts 1.0 mm of it past the end of the island, over
+  is centred on the row of contacts, where the dock's magnet is, which puts 1.0 mm of it past the end of the island, over
   the bend towards the cell tabs: the height of the tab joint there is not known yet. It
-  gives the dock's magnets something to hold: titanium is not magnetic, and without it "magnetic
+  gives the dock's magnet something to hold: titanium is not magnetic, and without it "magnetic
   charging" has nothing to pull on. Steel, not a magnet, so it works either way round and
   survives potting heat.
 
 ## Dock
 
-Modelled in `mechanical/manent_mech/dock.py`; `make cad` writes one printable body per ring
-size (`mechanical/out/print-dock-US*.stl`), and a test checks each of them.
+Modelled in `mechanical/manent_mech/dock.py`. `make cad` writes two printable bodies per ring
+size, `print-dock-US*.stl` and `print-dock-shoe-US*.stl`, and a test checks each size.
 
 - A **post** the ring slides onto, 0.5 mm smaller than the bore, so one per size: 17.6 mm for
-  US 8 to 21.7 mm for US 13. The ring rests on the base, which puts the three pins on the
-  middle of the band whichever way up it goes on.
-- **Three spring pins** in a row up the post, 1.0 mm body in a 1.05 mm hole, tip 0.4 mm so
-  that none can bridge two contacts. They stand 0.8 mm out and push the ring against the far
-  side of the post: the contact force comes from the fit, not from the magnets. The pin part
-  is not chosen.
-- **Two magnets**, one on each side of the pins, 1.9 mm away, behind 0.4 mm of plastic; they
-  go in from the hollow middle of the post. Each pocket takes two 2 x 3 mm discs or one block.
+  US 8 to 21.7 mm for US 13. The ring rests on the base, which puts the contacts at the
+  right height whichever way up it goes on.
+- A **shoe** in a slot of the post, pushed outwards by two small springs. It stands 0.8 mm
+  out when free and presses the ring against the far side of the post.
+- **Three contact bars** on the shoe's face: 0.4 mm wire laid along the arc in grooves, 0.15 mm
+  proud, each covering 22 degrees either side of the middle. Its two ends turn in through the
+  shoe, which holds it and gives somewhere to solder. Gold-plated spring wire, or the same
+  gold wire as the slugs.
+- **One magnet**, 4 x 4 x 2 mm, in the back of the shoe, behind the middle bar and so
+  straight under the keeper.
 - **Two grooves** on the base show where the button stops, one for each way round.
 - **Electrics**: USB-C socket with 5.1 k on each CC pin, a resettable fuse of the 50 mA class,
-  then the pins. The fuse is there because a ring put on askew can join the positive pin to
+  then the bars. The fuse is there because a ring sliding on can join the positive bar to
   ground through its own titanium edge. A pocket under the base takes the socket's board.
 - The ring's own light shows that it is charging. The dock needs none.
-- A **service clip** with five pins, for loading firmware into a closed ring, is the same
-  post with two more pins and no magnet on their side. Not modelled.
+- A **service clip** for loading firmware into a closed ring needs five points, not bars: the
+  same post with five spring pins, placed by eye. Not modelled.
 
-### What the numbers say about finding the contacts
+### Why bars and not pins
 
-The ring may be turned 3 degrees either way from true before a pin leaves its contact: half
-a millimetre at the bore, 0.6 mm at the button. The grooves alone ask for a steady hand.
+The first dock had three spring pins. A pin leaves its contact when the ring is turned
+3 degrees, half a millimetre at the bore, and two magnets either side of the pins were
+meant to find that position. A first-order estimate says they cannot: about 0.1 N each
+through 2 mm, against the friction of pins that must push with several times that.
 
-The magnets are meant to do it instead, and the model is not kind to them: they are 2.0 mm
-from the keeper, and only 60 % of each is under it, because the pins take the middle. Expect
-a weak pull, a detent at best. Two things would strengthen it and both have room: a keeper
-0.5 mm thick instead of 0.3, and taller magnets.
+A bar along the arc removes the problem instead of fighting it. The ring may be turned
+**17 degrees either way**, 3.7 mm at the button on the smallest size, and the grooves on the
+base are enough. Nothing changes in the ring.
 
-This is the first thing to try, and it needs no electronics: `print-block-US*.stl` now has a
-dimple on each contact and a pocket that puts a piece of steel exactly where the keeper will
-be. Print a block and its dock, add magnets, and see whether the ring turns itself onto the
-pins. If it does not, the choices are a wider contact (long pads need the board routed
-again), a dock that clips on at the button, or accepting the grooves.
+What a bar must not do is touch anything else on its way round. The model checks, with the
+ring seated 0.25 mm high or low: 0.15 mm to a service contact, 0.75 mm to the next charging
+contact and to the titanium. The tight one is the ground bar passing a service contact, which
+would be harmless (ground through 100 ohm); the positive bar has 0.1 mm more.
+
+### What the magnet is for now
+
+Not to find the contacts. It pulls the ring onto the bars, adds to the contact force and
+gives the snap the product site promises. The estimate is 0.25 N, good to a factor of two:
+seven times the ring's weight, so the ring stays on a dock held upside down if the estimate
+holds. The keeper is asked for 0.7 T, well under what steel carries. If the trial shows the
+magnet adds nothing, magnet and keeper can both go and the ring loses a part.
+
+### The trial
+
+Needs no electronics. `print-block-US*.stl` has a dimple on each contact and a pocket that
+puts a piece of steel exactly where the keeper will be. Print a block, a dock and a shoe; add
+the magnet, two springs and three wires; check with a meter that each bar finds its dimple
+over the whole 17 degrees and never the wrong one.
 
 ## Settings for the power chip
 

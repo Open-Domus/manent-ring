@@ -87,9 +87,9 @@ ISLAND_SPECS = (
 # through the resin skin and is ground flush with it. Diameter of the slug, by pad footprint.
 SLUG_D = {"Pad_Charge_D1.5": 1.4, "Pad_Service_D0.8": 0.6}
 SLUG_LIP = 0.3         # resin to keep between a slug and the edge of the titanium
-# Soft steel plate above the parts of the contacts island, for the dock's magnets to hold:
+# Soft steel plate above the parts of the contacts island, for the dock's magnet to hold:
 # length along the arc, width across the band, thickness. It is centred on the row of charging
-# contacts, not on the island, because the magnets stand on either side of the dock's pins.
+# contacts, not on the island, because the magnet sits behind the dock's middle contact.
 KEEPER = (4.2, 4.6, 0.3)
 PROTECTION_NETS = {"CELL_P", "CELL_N", "SENSE", "VM", "PROT_CO", "PROT_DO", "FET_MID"}
 

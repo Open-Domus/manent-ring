@@ -38,10 +38,12 @@
 4. Charging a 15 mAh cell at 8 mA through the power chip; fuel-gauge behaviour.
 5. Gold slug soldered to an ENIG pad: joint strength before and after potting; the same in 316L.
 6. Slugs and resin ground flush, then a week in artificial sweat, docked wet a few times.
-7. Dock and block as printed (`print-dock-*.stl`, `print-block-*.stl`), with magnets and a piece of
-   steel: whether the magnets turn the ring onto the pins through 2.0 mm, within 3 degrees. Do this
-   first: it costs an afternoon and decides the keeper's thickness or a different way to align.
-8. Spring pins: a part with a 1.0 mm body that holds contact at 0.3 mm of travel.
+7. Dock, shoe and block as printed (`print-dock-*.stl`, `print-block-*.stl`): whether each bar finds
+   its contact over the 17 degrees allowed and never a service contact; the pull of the magnet on a
+   piece of steel in the keeper's place, against the 0.25 N estimated. Do this first: it costs an
+   afternoon and says whether magnet and keeper earn their place.
+8. Contact between a 0.4 mm wire and a flush slug at a fraction of a newton: resistance, and wear of
+   both after a few hundred dockings.
 9. Delay between a button press and the microcontroller knowing, through the power chip's interrupt.
 
 ## To measure on a ring
@@ -55,6 +57,6 @@
 ## Not designed yet
 
 A board layout fit for fabrication (the routing in the repository proves connectivity only: see
-the Board section of design.md), the dock's electronics board and the service clip (the dock's body is modelled: charging.md), the button cap, the antenna and the clearing of the
+the Board section of design.md), the dock's electronics board, its springs and the service clip (the dock's body and shoe are modelled: charging.md), the button cap, the antenna and the clearing of the
 ground plane under it, firmware changes (pins, power chip
 driver, light, gestures), compliance (radio, potted lithium cell).

@@ -102,6 +102,9 @@ def test_a_dock_can_be_printed_for_every_size():
     for size in S.SIZES:
         rep = dock_report(WIDE.for_size(size), parts)
         assert rep["ok"], (size, rep)
-        # the three pins sit on the middle of the band, so the ring goes on either way round
-        assert rep["pin_z"][1] == WIDE.half_width and rep["pin_z"][0] + rep["pin_z"][2] == pytest.approx(WIDE.band_width)
-        assert rep["pin_pressed_by"] > 0 and rep["turn_tolerance_deg"] >= 2.5
+        # the three bars sit on the middle of the band, so the ring goes on either way round
+        assert rep["bar_z"][1] == WIDE.half_width and rep["bar_z"][0] + rep["bar_z"][2] == pytest.approx(WIDE.band_width)
+        # the ring only has to be turned roughly right: the button within 3 mm of its groove
+        assert rep["shoe_pressed_by"] > 0 and rep["turn_tolerance_deg"] >= 15 and rep["turn_tolerance_at_button_mm"] >= 3
+        # the keeper is not asked to carry more flux than steel can
+        assert rep["magnet"]["keeper_T"] < 1.6

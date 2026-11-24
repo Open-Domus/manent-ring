@@ -115,8 +115,8 @@ The full list with part numbers is `electrical/out/bom.csv`.
 - **Thermistor on the cell.** A 10 k thermistor next to the cell tabs lets the charger stop
   outside the cell's temperature range.
 - **Three charging pads, ground-positive-ground.** The ring can sit in its dock either way
-  round without reversing polarity, so no series diode is needed. Magnets go in the dock, a
-  steel plate for them to hold goes in the ring. Why contacts and not wireless charging, the
+  round without reversing polarity, so no series diode is needed. A magnet goes in the dock, a
+  steel plate for it to hold goes in the ring. Why contacts and not wireless charging, the
   slugs, the dock and the charger settings are in [charging.md](charging.md).
 - **Two service pads on the inner face** (SWDIO, SWDCLK). Once potted, the ring can still
   be reprogrammed from outside; 100 ohm in series protects the pins. A longer tail with
@@ -138,7 +138,7 @@ The full list with part numbers is `electrical/out/bom.csv`.
   the port), one small hole or thinned window for the light, one for the button.
 - The charging and service pads are on the board, 0.45 to 0.51 mm below the inner surface.
   A slug soldered to each one is ground flush with the resin after potting; a steel plate
-  above the same island gives the dock's magnets a hold. Sizes, material, the checks and
+  above the same island gives the dock's magnet a hold. Sizes, material, the checks and
   the dock are in [charging.md](charging.md).
 - Layout: seven islands, parts on both faces, in this order from the cell tabs: charging
   contacts and cell protection, button, power, microcontroller, microphone and light,

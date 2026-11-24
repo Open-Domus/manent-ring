@@ -118,6 +118,8 @@ if __name__ == "__main__":
         export_stl(block, str(out / f"print-block-{tag}.stl"))
     from .dock import build as build_dock
     for size in S.SIZES:
-        export_stl(build_dock("B", size), str(out / f"print-dock-US{size}.stl"))
+        body, shoe = build_dock("B", size)
+        export_stl(body, str(out / f"print-dock-US{size}.stl"))
+        export_stl(shoe, str(out / f"print-dock-shoe-US{size}.stl"))
     print("print-shell-*.stl and print-block-*.stl written for the reference size and each size offered;"
           " print-dock-*.stl for each size")
