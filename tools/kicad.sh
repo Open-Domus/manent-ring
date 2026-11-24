@@ -41,10 +41,14 @@ quote)
   cp kicad/manent.kicad_pcb kicad/manent.kicad_pro kicad/manent.kicad_dru out/quote/
   (cd out/quote && rm -f ../../../quote/manent-ring-quote.zip && zip -qr ../../../quote/manent-ring-quote.zip .)
   ;;
+prep)
+  py gen/pcb_build.py
+  py gen/pcb_dump.py
+  ;;
 route)
   # Routes from scratch: several minutes. Needs the pad geometry of the placed board.
   py gen/pcb_build.py
   py gen/pcb_dump.py
-  (cd .. && uv run python -u -m electrical.gen.router)
+  (cd .. && uv run python -u -m electrical.gen.router $SEEDS)
   ;;
 esac

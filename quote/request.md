@@ -11,24 +11,24 @@ us what you would change.
 
 | Item | Value |
 | --- | --- |
-| Outline | strip 34.8 x 5.6 mm, plus a test tail 2.0 x 9.6 mm that is cut off after test |
+| Outline | strip 39.9 x 5.6 mm, plus a rigid test tail 3.4 x 9.6 mm that is cut off after test |
 | Type | rigid-flex, flat, bent once into a ring of about 9 mm inner radius at installation |
-| Rigid areas | six islands along the strip; see the lines on the Dwgs.User layer |
+| Rigid areas | eight along the strip (seven islands with parts and the area of the cell tabs), plus the tail; see the lines on the Dwgs.User layer |
 | Copper layers | 6 on the rigid islands |
-| Flex | layers 3 and 4 continue through the five bends as a two-layer flex; layer 3 is a ground plane |
+| Flex | layers 3 and 4 continue through the seven bends (1.0 to 1.4 mm long) as a two-layer flex; layer 3 is a ground plane |
 | Island thickness | as thin as your six-layer stackup allows; our model assumes 0.45 mm |
 | Track and gap | 0.075 mm on all layers |
-| Vias | laser, 0.10 mm hole, 0.20 mm pad; 236 in all |
-| Via structure | 124 between adjacent layers, 112 stacked across three to six layers (any-layer) |
+| Vias | laser, 0.10 mm hole, 0.20 mm pad; 260 in all |
+| Via structure | 146 between adjacent layers, 113 stacked across three to five layers, 1 through all six (any-layer) |
 | Via in pad | yes, on three WLCSP parts and on 0201 pads: copper filled and capped |
-| Vias in the flex | none |
+| Vias in the flex | none, and none within 0.3 mm of a rigid-to-flex line |
 | Smallest pitch | 0.30 mm (nRF54L15, WLCSP-47); also 0.42 x 0.44 mm (WLCSP-35) and 0.50 mm (WLCSP-21) |
 | Hole to hole | 0.20 mm |
 | Copper to edge | 0.15 mm |
 | One non-plated hole | 0.60 mm, the sound port of a microphone |
-| Finish | ENIG or ENEPIG |
+| Finish | ENIG; ENEPIG if you recommend it for the exposed charging pads |
 | Solder mask | both faces; no silkscreen |
-| Parts | 58 to place, on both faces; smallest passive 0201. The cell is soldered to its tabs by us |
+| Parts | 56 to place, on both faces; smallest passive 0201. The cell is soldered to its tabs by us |
 
 ## Quantities
 

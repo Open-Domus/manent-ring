@@ -12,7 +12,8 @@ def test_site_envelope_reproduces_the_render_numbers():
     assert SITE.wall_edge == pytest.approx(2.4)
     assert SITE.wall_centre == pytest.approx(2.96)
     assert SITE.outer_diameter / 2 == pytest.approx(12.08)
-    assert cavity_height(SITE, 6.0) == pytest.approx(1.80, abs=0.01)
+    # the titanium wraps the corners at full thickness, which costs height near the edges
+    assert cavity_height(SITE, 6.0) == pytest.approx(1.71, abs=0.01)
 
 
 def test_both_envelopes_sit_on_the_same_finger():

@@ -6,7 +6,7 @@ request is `README.md` inside the zip.
 ```
 Request for quotation: 6-layer rigid-flex with any-layer HDI, with assembly.
 
-Strip 34.8 x 5.6 mm, six rigid islands joined by a two-layer flex (layers 3-4), bent once
+Strip 39.9 x 5.6 mm, eight rigid areas joined by a two-layer flex (layers 3-4), bent once
 at installation. Laser microvias 0.10 mm hole / 0.20 mm pad, stacked, filled and capped
 via in pad (0.30 mm pitch WLCSP and 0201 pads). Track and gap 0.075 mm. ENIG. No silkscreen.
 

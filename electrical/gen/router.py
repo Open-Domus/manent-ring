@@ -12,6 +12,7 @@ Construction assumed (see docs/fabricators.md):
   - one track width and one clearance everywhere.
 """
 import heapq
+import os
 import json
 import math
 import sys
@@ -38,7 +39,9 @@ GRIDS = {"nRF54L15_CSP47": (7, 7), "nPM1304_CSP35": (5, 7)}
 # On these packages a via touching a pad sits on its centre, or not on the pad at all.
 CENTRE_ONLY = set(GRIDS) | {"W25Q128JW_WLCSP21"}
 TRANSITION = 0.30     # no via this close to the line where an island ends and the flex begins
-TAIL_LAYER = 0        # the test tail carries tracks on its pad layer only, and no vias
+HALO = float(os.environ.get("HALO", 0.3))     # room around another net's pad that a track should leave alone
+HALO_COST = int(os.environ.get("HALO_COST", 2))   # a step there counts as this many
+OUTER = os.environ.get("OUTER", "gnd")
 
 
 def disc(radius_mm: float) -> list[tuple[int, int]]:
@@ -86,11 +89,8 @@ class Board:
                         self.allowed[l, :, a:b] = False
                 self.novia[:, :, self.ix(z["x0"] - TRANSITION):self.ix(z["x1"] + TRANSITION) + 1] = True
         # The tail is cut off after the test: nothing but the stubs to its own pads may be there.
+        # It is rigid like the island it leaves, so a stub may use any layer.
         self.tail = inside & (self.gy[:, None] > cut_y - G / 2)
-        for l in range(layers):
-            if l != TAIL_LAYER:
-                self.allowed[l][self.tail] = False
-        self.novia[:, self.tail] = True
         self.claim = np.zeros((layers, self.h, self.w), np.int32)
         self.nohole = np.zeros((layers, self.h, self.w), bool)      # no new hole here
         self.nohole_grid = np.zeros((layers, self.h, self.w), bool) # same, for holes in grid-package pads
@@ -98,6 +98,7 @@ class Board:
         footprint = {p["ref"]: p["footprint"] for p in board["parts"]}
 
         self.net_id, self.pads = {}, []
+        self.halo = np.zeros((layers, self.h, self.w), np.int32)   # whose pad is near: net, or -1 for several
         for i, p in enumerate(data["pads"]):
             if p["kind"] == "hole":
                 self.block_disc(p["x"], p["y"], p["d"] / 2 + EDGE + TRACK / 2 + SLACK)
@@ -136,8 +137,14 @@ class Board:
                 near = dilate(spot, disc((max(xs) - min(xs)) / 2 + VIA_PAD / 2 + G))
                 # Outer balls of a ball grid leave on the surface: a via there would wall in the
                 # ring behind it. Every other ball may take a via on its centre.
-                near[cy, cx] = bool(grid) and ring == 0
+                near[cy, cx] = bool(grid) and ring == 0 and {"surface": True, "gnd": name != PLANE_NET, "free": False}[OUTER]
                 self.novia[layer] |= near
+            k = int(round(HALO / G))
+            deep = (layer - ring if layer else ring) if grid else layer
+            for l in range(min(layer, deep), max(layer, deep) + 1):
+                h = self.halo[l, max(0, y_a - k):y_b + k, max(0, x_a - k):x_b + k]
+                h[(h != 0) & (h != net)] = -1
+                h[h == 0] = net
             self.pads.append({"ref": p["ref"], "pad": p["pad"], "net": net, "name": name, "layer": layer,
                               "x": p["x"], "y": p["y"], "cells": cells, "ring": ring, "cy": cy, "cx": cx,
                               "grid": centred, "tail": p["y"] > cut_y})
@@ -202,7 +209,7 @@ class Router:
     """Routes net by net. When a connection is walled in by earlier nets, those nets are
     ripped out, the connection is made, and they go back in the queue."""
 
-    MAX_RIPS = 25
+    MAX_RIPS = int(os.environ.get("MAX_RIPS", 10))
 
     def __init__(self, board: Board):
         self.b = board
@@ -218,7 +225,7 @@ class Router:
         self.hole_keep_grid = disc(VIA_DRILL + HOLE_TO_HOLE - 0.01)
         self.near = disc(VIA_PAD / 2)
         self.fan_vias, self.records, self.claimed = [], {}, {}
-        self.failed, self.rips, self.seen = {}, {}, {}
+        self.failed, self.rips, self.seen, self.why = {}, {}, {}, ""
         self.tail_open = False              # True only while a tail pad is being connected
 
     # ---- copper bookkeeping -------------------------------------------------------
@@ -282,6 +289,7 @@ class Router:
                         for l in range(b.layers)]) & free
         plane = (ok[b.plane] & ~b.tail).tobytes()
         ok[b.plane] = False                 # the plane layer takes vias, not tracks
+        self.cost = np.where((b.halo != 0) & (b.halo != net), HALO_COST, 1).astype(np.uint8).tobytes()
         return ok.tobytes(), bytearray(via.tobytes()), plane
 
     def search(self, sources, goal, okb, viab, target, done=None):
@@ -301,6 +309,7 @@ class Router:
             heap.append((heur(s), 0.0, s))
         heapq.heapify(heap)
         hmax, wmax = b.h - 1, w - 1
+        cost = self.cost
         self.seen = dist                    # kept for diagnosis: what the last search reached
         while heap:
             _, gc, idx = heapq.heappop(heap)
@@ -321,7 +330,7 @@ class Router:
                 n = idx + dy * w + dx
                 if not okb[n] and (goal is None or n not in goal):
                     continue
-                ng = gc + c
+                ng = gc + c * cost[n]
                 if ng < dist.get(n, 1e18):
                     dist[n] = ng
                     prev[n] = idx
@@ -390,11 +399,32 @@ class Router:
                 for l in range(l1, l2 + 1):
                     holes[0][l] |= keep
                     holes[1][l] |= keep
-        okb, viab, plane = self.maps(net, self.base_claim, holes)
+        # Nets ripped out too often stay where they are: the search goes round them.
+        claim = self.base_claim
+        tired = [m for m, n in self.rips.items() if n >= self.MAX_RIPS and m != net and m in self.records]
+        if tired:
+            claim = claim.copy()
+            flat = claim.reshape(-1)
+            for m in tired:
+                cells = np.fromiter(self.claimed.get(m, ()), np.int64)
+                if len(cells):
+                    mine = flat[cells]
+                    flat[cells] = np.where(mine == 0, m, np.where(mine == m, m, -1))
+                for rec in self.records[m]:
+                    if rec[0] == "via":
+                        _, y, x, l1, l2 = rec
+                        stamp = np.zeros((b.h, b.w), bool)
+                        stamp[y, x] = True
+                        keep = dilate(stamp, self.hole_keep)
+                        for l in range(l1, l2 + 1):
+                            holes[0][l] |= keep
+                            holes[1][l] |= keep
+        okb, viab, plane = self.maps(net, claim, holes)
         if done is not None:
             done = lambda i, p=plane: lo <= i < lo + b.hw and p[i - lo]
         path = self.spaced(sources, goal, okb, viab, target, done)
         if path is None:
+            self.why = "walled in" + (" by " + ",".join(b.names[m] for m in tired) if tired else " on the bare board")
             return None, []
         touched = set()
         for i in path:
@@ -403,8 +433,9 @@ class Router:
             for dx, dy in self.near:
                 if 0 <= x + dx < b.w and 0 <= y + dy < b.h:
                     touched.add(i + dy * b.w + dx)
-        blockers = [m for m, cells in self.claimed.items() if m != net and not cells.isdisjoint(touched)]
-        if not blockers or any(self.rips.get(m, 0) >= self.MAX_RIPS for m in blockers):
+        blockers = [m for m, cells in self.claimed.items() if m != net and m not in tired and not cells.isdisjoint(touched)]
+        if not blockers:
+            self.why = "hole spacing"
             return None, []
         for m in blockers:
             self.rips[m] = self.rips.get(m, 0) + 1
@@ -428,7 +459,7 @@ class Router:
                 self.tail_open = False
                 ripped += out
                 if path is None:
-                    self.failed.setdefault(net, []).append((p["ref"], p["pad"]))
+                    self.failed.setdefault(net, []).append((p["ref"], p["pad"], self.why))
                 elif len(path) > 1:
                     self.commit(net, path)
             return ripped
@@ -446,7 +477,7 @@ class Router:
                 path, out = self.connect(net, tree, goal, target)
                 ripped += out
                 if path is None:
-                    self.failed.setdefault(net, []).append((target["ref"], target["pad"]))
+                    self.failed.setdefault(net, []).append((target["ref"], target["pad"], self.why))
                     stage.remove(target)
                     continue
                 reached = goal[path[-1]]
@@ -541,7 +572,8 @@ def order(board: Board, rng) -> list[int]:
         ps = [p for p in board.pads if p["net"] == net]
         return (max(p["x"] for p in ps) - min(p["x"] for p in ps)) + (max(p["y"] for p in ps) - min(p["y"] for p in ps))
     nets = [n for n in board.names if sum(p["net"] == n for p in board.pads) > 1]
-    return sorted(nets, key=lambda n: (board.names[n] == PLANE_NET, span(n) * rng.uniform(0.7, 1.3)))
+    first = os.environ.get("GND_FIRST", "0") == "1"      # ground stubs are short: they take their via sites early
+    return sorted(nets, key=lambda n: ((board.names[n] == PLANE_NET) != first, span(n) * rng.uniform(0.7, 1.3)))
 
 
 def attempt(layers: int, seed: int) -> dict:
@@ -564,6 +596,19 @@ def attempt(layers: int, seed: int) -> dict:
                 queue.remove(m)
         ground = [n for n in queue if board.names[n] == PLANE_NET]
         queue = [n for n in queue if board.names[n] != PLANE_NET] + out + ground
+    for _ in range(int(os.environ.get("RETRIES", 3))):      # nets left open get another go, last of all
+        again = list(r.failed)
+        if not again:
+            break
+        for net in again:
+            del r.records[net]
+        r.rebuild()
+        queue = again
+        while queue:
+            net = queue.pop(0)
+            out = r.route_net(net)
+            rips += len(out)
+            queue = [n for n in queue if n not in out] + out
     res = r.result()
     res["seed"] = seed
     print(f"seed {seed}: {layers} layers, {len(res['tracks'])} tracks, {len(res['vias'])} vias, {rips} rip-ups, "
@@ -571,7 +616,7 @@ def attempt(layers: int, seed: int) -> dict:
     return res
 
 
-def run(layers: int, seeds=(4, 5, 1, 2, 3, 6)):
+def run(layers: int, seeds=(1, 4, 8, 3, 7, 2)):
     best = None
     for seed in seeds:
         res = attempt(layers, seed)
@@ -579,7 +624,7 @@ def run(layers: int, seeds=(4, 5, 1, 2, 3, 6)):
             best = res
         if not best["failed"]:
             break
-    (OUT / "routes.json").write_text(json.dumps(best))
+    (OUT / os.environ.get("ROUTES_OUT", "routes.json")).write_text(json.dumps(best))
     for f in best["failed"]:
         print("  not routed:", *f)
     return best
@@ -587,4 +632,4 @@ def run(layers: int, seeds=(4, 5, 1, 2, 3, 6)):
 
 if __name__ == "__main__":
     run(json.loads((OUT / "board.json").read_text())["layers"],
-        seeds=[int(a) for a in sys.argv[1:]] or (4, 5, 1, 2, 3, 6))
+        seeds=[int(a) for a in sys.argv[1:]] or (1, 4, 8, 3, 7, 2))

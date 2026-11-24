@@ -6,10 +6,13 @@ figures are catalogue values, not a supplier's drawing.
 
 ## Rules the model applies
 
-- Titanium shell 0.40 thick on the outer face and the side walls; resin skin 0.35 towards the finger.
+- Titanium shell 0.40 thick on the outer face, the side walls and round the corners; resin skin 0.35
+  towards the finger, in the window between the two inner corners.
 - At least 0.10 of resin around every part.
 - Cell: 8% thickness growth allowed for, plus 0.05 of wrap on each side.
-- Flex 5.6 wide; islands joined by 1.0 of bare flex; 3.0 for the cell tabs.
+- Flex 5.6 wide; islands 0.45 thick, joined by 1.0 to 1.4 of bare flex; 3.0 for the cell tabs.
+- Each bend must be long enough to span the step in depth between its two islands, and fold no tighter
+  than ten times the flex thickness.
 - Every part in the bill of materials is placed, on one of the two faces of an island, in columns
   across the flex, 0.15 apart, with extra room around the fine-pitch packages. This checks that
   the parts have room; it does not check that the tracks between them can be routed.
@@ -21,20 +24,21 @@ figures are catalogue values, not a supplier's drawing.
 Reference finger: inner diameter 18.24 (US 8.13), outer diameter 24.16.
 **Result: does not fit.**
 
-Cavity height available to a centred part, by part width: 4.0 wide: 2.05, 5.0 wide: 1.95, 5.6 wide: 1.89, 6.0 wide: 1.8, 6.5 wide: 1.5.
+Cavity height available to a centred part, by part width: 4.0 wide: 2.05, 5.0 wide: 1.95, 5.6 wide: 1.89, 6.0 wide: 1.71, 6.5 wide: 1.16.
 
 | Island | Length | Stack height | Resin left around it | Centre at | Result |
 | --- | --- | --- | --- | --- | --- |
-| contacts | 3.0 | 1.00 | 0.68 | 5 deg | fits |
-| button | 2.4 | 1.40 | 0.37 | 25 deg | fits |
-| soc | 6.35 | 1.70 | 0.05 | 54 deg | FAILS  |
-| audio | 4.2 | 1.73 | 0.18 | 88 deg | fits |
-| power | 4.82 | 1.65 | 0.17 | 118 deg | fits |
-| antenna | 5.0 | 0.90 | 0.73 | 150 deg | fits |
+| contacts | 3.4 | 1.00 | 0.67 | 3 deg | fits |
+| button | 2.4 | 1.03 | 0.77 | 25 deg | fits |
+| power | 5.12 | 1.65 | 0.17 | 49 deg | fits |
+| soc | 4.3 | 1.67 | 0.16 | 78 deg | fits |
+| audio | 4.5 | 1.73 | 0.18 | 104 deg | fits |
+| storage | 4.75 | 0.96 | 0.68 | 133 deg | fits |
+| antenna | 5.0 | 0.90 | 0.73 | 163 deg | fits |
 
-- **Cell**: GRP160626, 26.0 x 6.0 x 1.6, 15.5 mAh. Room left on each side after swelling: 0.03 (less than the 0.05 required). It spans 141.1 degrees.
-- **Arc**: electronics take 35.77 of arc; +3.7 is left over.
-- **Mass** (estimate): titanium 1.29 g, total about 2.94 g.
+- **Cell**: GRP160626, 26.0 x 6.0 x 1.6, 15.5 mAh. Room left on each side after swelling: -0.01 (less than the 0.05 required). It spans 140.5 degrees.
+- **Arc**: electronics take 38.74 of arc; +0.9 is left over.
+- **Mass** (estimate): titanium 1.41 g, total about 3.02 g.
 - Drawings: [plan](../mechanical/out/plan-A.svg), [audio island section](../mechanical/out/section-A-audio.svg), [SoC island section](../mechanical/out/section-A-soc.svg).
 
 ## Envelope B-8.0: 8.0 wide, wall 2.6 to 3.0
@@ -42,20 +46,21 @@ Cavity height available to a centred part, by part width: 4.0 wide: 2.05, 5.0 wi
 Reference finger: inner diameter 18.24 (US 8.13), outer diameter 24.24.
 **Result: everything fits.**
 
-Cavity height available to a centred part, by part width: 4.0 wide: 2.15, 5.0 wide: 2.09, 5.6 wide: 2.05, 6.0 wide: 2.02, 6.5 wide: 1.96.
+Cavity height available to a centred part, by part width: 4.0 wide: 2.15, 5.0 wide: 2.09, 5.6 wide: 2.05, 6.0 wide: 2.02, 6.5 wide: 1.89.
 
 | Island | Length | Stack height | Resin left around it | Centre at | Result |
 | --- | --- | --- | --- | --- | --- |
-| contacts | 3.0 | 1.00 | 0.75 | 5 deg | fits |
-| button | 2.4 | 1.40 | 0.40 | 25 deg | fits |
-| soc | 6.35 | 1.70 | 0.10 | 54 deg | fits |
-| audio | 4.2 | 1.73 | 0.22 | 88 deg | fits |
-| power | 4.82 | 1.65 | 0.23 | 118 deg | fits |
-| antenna | 5.0 | 0.90 | 0.83 | 150 deg | fits |
+| contacts | 3.4 | 1.00 | 0.74 | 4 deg | fits |
+| button | 2.4 | 1.03 | 0.80 | 25 deg | fits |
+| power | 5.12 | 1.65 | 0.23 | 49 deg | fits |
+| soc | 4.3 | 1.67 | 0.22 | 78 deg | fits |
+| audio | 4.5 | 1.73 | 0.22 | 104 deg | fits |
+| storage | 4.75 | 0.96 | 0.73 | 132 deg | fits |
+| antenna | 5.0 | 0.90 | 0.83 | 162 deg | fits |
 
-- **Cell**: GRP1707xx, 29 mm (exact code to confirm), 29.0 x 6.5 x 1.7, 21.5 mAh. Room left on each side after swelling: 0.06 (enough). It spans 157.0 degrees.
-- **Arc**: electronics take 35.77 of arc; +0.9 is left over.
-- **Mass** (estimate): titanium 1.42 g, total about 3.28 g.
+- **Cell**: GRP160626, 26.0 x 6.0 x 1.6, 15.5 mAh. Room left on each side after swelling: 0.15 (enough). It spans 140.6 degrees.
+- **Arc**: electronics take 38.58 of arc; +1.1 is left over.
+- **Mass** (estimate): titanium 1.54 g, total about 3.36 g.
 - Drawings: [plan](../mechanical/out/plan-B.svg), [audio island section](../mechanical/out/section-B-audio.svg), [SoC island section](../mechanical/out/section-B-soc.svg).
 
 ## Ring sizes
@@ -64,14 +69,39 @@ The electronics need the same arc on every finger, so the cell gets what is left
 
 | US size | Inner diameter | Longest cell | Best catalogue cell, 7.4 band | Best catalogue cell, 8.0 band |
 | --- | --- | --- | --- | --- |
-| 6 | 16.51 | 24.4 | none | grp1707_22 (14.5 mAh) |
-| 7 | 17.32 | 27.0 | none | grp160626 (15.5 mAh) |
-| 8 | 18.13 | 29.5 | none | grp1707_29 (21.5 mAh) |
-| 9 | 18.95 | 32.1 | none | grp1707_29 (21.5 mAh) |
-| 10 | 19.76 | 34.6 | none | grp1707_29 (21.5 mAh) |
-| 11 | 20.57 | 37.2 | none | grp1707_29 (21.5 mAh) |
-| 12 | 21.38 | 39.7 | none | grp1707_29 (21.5 mAh) |
-| 13 | 22.2 | 42.3 | none | grp1707_29 (21.5 mAh) |
+| 8 | 18.13 | 26.8 | none | grp160626 (15.5 mAh) |
+| 9 | 18.95 | 29.3 | none | grp160626 (15.5 mAh) |
+| 10 | 19.76 | 31.8 | none | grp160626 (15.5 mAh) |
+| 11 | 20.57 | 34.4 | none | grp160626 (15.5 mAh) |
+| 12 | 21.38 | 36.9 | none | grp160626 (15.5 mAh) |
+| 13 | 22.2 | 39.4 | none | grp160626 (15.5 mAh) |
 
-The largest cell in the catalogue family is 29 long. Where the table shows room for a longer one,
-more capacity needs a cell made to order: roughly 0.74 mAh per millimetre, by proportion.
+Only the 1.6 x 6.0 cell passes the cross-section check, and it comes in one length (26). Where the table
+shows room for a longer one, more capacity needs a cell made to order: roughly 0.6 mAh per millimetre,
+by proportion.
+
+## How much margin there is
+
+The two least certain numbers are the thickness of the rigid islands (an estimate until a fabricator
+gives a stack-up) and how much the cell swells over its life. Margin is what is left beyond the rule,
+on the 8.0 band.
+
+| Assumption | Margin | Result |
+| --- | --- | --- |
+| island thickness 0.40 | +0.145 | fits |
+| island thickness 0.45 | +0.120 | fits |
+| island thickness 0.50 | +0.095 | fits |
+| island thickness 0.55 | +0.070 | fits |
+| island thickness 0.60 | +0.045 | fits |
+| GRP160626 (1.6 x 6.0) swollen 0% | +0.162 | fits |
+| GRP170722 (1.7 x 6.5) swollen 0% | +0.040 | fits |
+| GRP170729 (1.7 x 6.5) swollen 0% | +0.040 | fits |
+| GRP160626 (1.6 x 6.0) swollen 5% | +0.122 | fits |
+| GRP170722 (1.7 x 6.5) swollen 5% | +0.000 | fits |
+| GRP170729 (1.7 x 6.5) swollen 5% | +0.000 | fits |
+| GRP160626 (1.6 x 6.0) swollen 8% | +0.098 | fits |
+| GRP170722 (1.7 x 6.5) swollen 8% | -0.024 | does not fit |
+| GRP170729 (1.7 x 6.5) swollen 8% | -0.024 | does not fit |
+| GRP160626 (1.6 x 6.0) swollen 10% | +0.082 | fits |
+| GRP170722 (1.7 x 6.5) swollen 10% | -0.041 | does not fit |
+| GRP170729 (1.7 x 6.5) swollen 10% | -0.041 | does not fit |

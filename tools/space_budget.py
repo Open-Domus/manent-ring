@@ -5,7 +5,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from mechanical.manent_mech import stack as S          # noqa: E402
-from mechanical.manent_mech.checks import full_report  # noqa: E402
+from mechanical.manent_mech.checks import full_report, sensitivity  # noqa: E402
 
 rep = full_report()
 o = ["# Space budget", "",
@@ -13,10 +13,14 @@ o = ["# Space budget", "",
      "Part sizes come from `parts/parts.yaml`; several are still unverified there, and the cell",
      "figures are catalogue values, not a supplier's drawing.", "",
      "## Rules the model applies", "",
-     "- Titanium shell 0.40 thick on the outer face and the side walls; resin skin 0.35 towards the finger.",
+     "- Titanium shell 0.40 thick on the outer face, the side walls and round the corners; resin skin 0.35",
+     "  towards the finger, in the window between the two inner corners.",
      "- At least 0.10 of resin around every part.",
      f"- Cell: {S.SWELL:.0%} thickness growth allowed for, plus {S.CELL_GAP} of wrap on each side.",
-     f"- Flex {S.FLEX_WIDTH} wide; islands joined by {S.BEND} of bare flex; {S.CELL_TABS} for the cell tabs.",
+     f"- Flex {S.FLEX_WIDTH} wide; islands {S.RIGID_T} thick, joined by {min(S.BENDS)} to {max(S.BENDS)} of bare flex; "
+     f"{S.CELL_TABS} for the cell tabs.",
+     "- Each bend must be long enough to span the step in depth between its two islands, and fold no tighter",
+     "  than ten times the flex thickness.",
      "- Every part in the bill of materials is placed, on one of the two faces of an island, in columns",
      f"  across the flex, {S.PART_SPACING} apart, with extra room around the fine-pitch packages. This checks that",
      "  the parts have room; it does not check that the tracks between them can be routed.",
@@ -48,7 +52,15 @@ o += ["## Ring sizes", "",
 for ra, rb in zip(rep["size_sweep"]["A"], rep["size_sweep"]["B"]):
     f = lambda r: f"{r['best_cell']} ({r['capacity_mah']} mAh)" if r["best_cell"] else "none"
     o.append(f"| {ra['us_size']} | {ra['inner_diameter']} | {rb['max_cell_length']} | {f(ra)} | {f(rb)} |")
-o += ["", "The largest cell in the catalogue family is 29 long. Where the table shows room for a longer one,",
-      "more capacity needs a cell made to order: roughly 0.74 mAh per millimetre, by proportion.", ""]
+o += ["", "Only the 1.6 x 6.0 cell passes the cross-section check, and it comes in one length (26). Where the table",
+      "shows room for a longer one, more capacity needs a cell made to order: roughly 0.6 mAh per millimetre,",
+      "by proportion.", "",
+      "## How much margin there is", "",
+      "The two least certain numbers are the thickness of the rigid islands (an estimate until a fabricator",
+      "gives a stack-up) and how much the cell swells over its life. Margin is what is left beyond the rule,",
+      "on the 8.0 band.", "",
+      "| Assumption | Margin | Result |", "| --- | --- | --- |"]
+o += [f"| {r['what']} | {r['margin']:+.3f} | {'fits' if r['ok'] else 'does not fit'} |" for r in sensitivity()]
+o.append("")
 (ROOT / "docs" / "space-budget.md").write_text("\n".join(o))
 print("docs/space-budget.md written")

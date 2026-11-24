@@ -68,7 +68,7 @@ def test_only_the_two_flex_layers_cross_the_bends_and_no_via_is_near_them(routed
     routes, board = routed
     flex = {routes["layers"] // 2 - 1, routes["layers"] // 2}
     bends = [(z["x0"], z["x1"]) for z in board["zones"] if z["kind"] == "bend"]
-    assert len(bends) == 6
+    assert len(bends) == 7
     for net, layer, a, b in _segments(routes):
         lo, hi = sorted((a[0], b[0]))
         if layer not in flex:
@@ -81,11 +81,10 @@ def test_cutting_the_test_tail_cuts_nothing_else(routed):
     routes, board = routed
     cut = board["tail_cut"][2]
     tail_nets = {"NRESET", "UART_TX", "UART_RX", "V1V8", "GND", "VBAT", "VBUS"}
-    assert not [v for v in routes["vias"] if v["y"] > cut]
+    # The tail is rigid, so a stub may change layer on it; what matters is what the cut severs.
+    assert {v["net"] for v in routes["vias"] if v["y"] > cut} <= tail_nets
     crossings = {}
     for net, layer, a, b in _segments(routes):
-        if max(a[1], b[1]) > cut:
-            assert layer == 0, (net, layer)
         if (a[1] > cut) != (b[1] > cut):
             crossings[net] = crossings.get(net, 0) + 1
     # one stub per test pad and nothing else: no net runs through the tail and back
@@ -124,3 +123,20 @@ def test_vias_on_grid_packages_sit_on_pad_centres(routed):
                 if v["l1"] <= layer <= v["l2"]:
                     dist = ((v["x"] - cx) ** 2 + (v["y"] - cy) ** 2) ** 0.5
                     assert dist < 0.005 or dist > d / 2 + 0.1 - 0.005, (part["ref"], v, dist)
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_quote_request_quotes_the_board_as_it_is():
+    import sys
+    sys.path.insert(0, str(ROOT / "tools"))
+    from board_facts import facts
+    f, text = facts(), (ROOT / "quote" / "request.md").read_text()
+    strip_l, strip_w = f["strip"].split(" x ")
+    for claim in (f"strip {float(strip_l):.1f} x {strip_w} mm", f"{f['vias']} in all",
+                  f"{f['vias, adjacent layers']} between adjacent layers", f"{f['vias, stacked']} stacked",
+                  f"{f['vias, through all layers']} through all six", f"| Parts | {f['parts to place']} to place"):
+        assert claim in text, claim
+    assert f["bends"] == 7 and "seven bends" in text
+    assert f["rigid areas"] == 8 and "eight along the strip" in text

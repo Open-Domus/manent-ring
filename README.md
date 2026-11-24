@@ -26,7 +26,7 @@ Needs `uv`, and either KiCad 10 or Docker (`docker pull kicad/kicad:10.0`).
 ```
 make all        # schematic, board, checks, tests, fit report, drawings, budgets, STEP
 make test       # tests only
-make route      # route the board again from scratch (several minutes)
+make route      # route the board again from scratch (several minutes; it may not finish every time)
 ```
 
 The schematic and the board are generated: edit `electrical/gen/design.py` and the fit

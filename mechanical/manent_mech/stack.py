@@ -55,7 +55,7 @@ SOLDER = 0.05          # stand-off of a soldered part
 # Length of flex in each gap: after the cell tabs, between neighbouring islands, after the last
 # island. Neighbours sit at different depths in the wall, so each gap needs its own length;
 # checks.bend_report says how much.
-BENDS = (1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+BENDS = (1.0, 1.4, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
 CELL_TABS = 3.0        # arc taken by the cell tabs and their joint
 CLOSING_GAP = 1.0      # free arc left to close the loop
 SWELL = 0.08           # cell thickness growth to allow for
@@ -73,12 +73,14 @@ ISLAND_SPECS = (
     # Charging and service pads face the finger; cell protection sits behind them.
     ("contacts", RIGID_T, "in", 3.4, None),
     ("button", RIGID_T, "out", 2.4, (-15.0, 30.0)),
+    # The charger sits between the contacts and the microcontroller: the charge path stays short
+    # and the fewest tracks cross each bend.
+    ("power", RIGID_T, "mid", 0.0, None),
     ("soc", RIGID_T, "mid", 0.0, None),
     ("audio", RIGID_T, "out", 0.0, (60.0, 120.0)),
     # The flash has its own island: it keeps the microcontroller island short, which is where
     # the wall is tightest, and leaves room to route around both chips.
     ("storage", RIGID_T, "mid", 0.0, None),
-    ("power", RIGID_T, "mid", 0.0, None),
     ("antenna", RIGID_T, "mid", 5.0, None),       # kept long: the antenna needs clear board
 )
 PROTECTION_NETS = {"CELL_P", "CELL_N", "SENSE", "VM", "PROT_CO", "PROT_DO", "FET_MID"}
@@ -107,7 +109,8 @@ def home_of(c) -> tuple[str, str]:
     """Island and face of a circuit component."""
     nets = set(n for n in c.nets.values() if n)
     if c.sheet == "power":
-        if nets & PROTECTION_NETS or c.sym.name == "TVS" or "NTC" in nets:
+        # The charger itself stays with its inductor and capacitors, whatever nets it touches.
+        if c.value != "nPM1304" and (nets & PROTECTION_NETS or c.sym.name == "TVS" or "NTC" in nets):
             return "contacts", "out"
         big = c.value in ("nPM1304", "2.2uH") or c.fields.get("Package") == "0402"
         return "power", "in" if big else "out"
