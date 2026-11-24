@@ -14,7 +14,6 @@
 
 | Item | Where to look |
 | --- | --- |
-| nPM1304: what to do with SW2, VOUT2, LED0-2, GPIO2-3 when unused; which capacitor on which net | Nordic's reference design files for configuration 2 |
 | W25Q128JW WLCSP body size; availability of the special-order package | Winbond |
 | Flash /WP and /HOLD termination in single-bit SPI | Winbond |
 | nRF54L15 land pad diameter; nPM1304 ball pitch direction; S-82A1A pin order; 32 MHz crystal land pattern | manufacturers' package drawings |

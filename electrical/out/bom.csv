@@ -1,11 +1,12 @@
 References,Quantity,Value,Manufacturer,Part number,Package,Fitted,Notes
-U1,1,nPM1304,Nordic Semiconductor,nPM1304-CAAA-R,WLCSP-35,yes,"BUCK2 unused: VSET2 grounded as documented; SW2 open and VOUT2 grounded are not confirmed. LED0-2, GPIO2-3 left open: not confirmed"
+U1,1,nPM1304,Nordic Semiconductor,nPM1304-CAAA-R,WLCSP-35,yes,"BUCK2 unused as in Nordic's reference configuration 2: VSET2 grounded, SW2 open, VOUT2 to VSYS. LED0-2, GPIO2-3 left open"
 R1,1,10k NTC,,,0201,yes,"Thermistor, to sit against the cell: stops charging when hot or cold"
 L1,1,2.2uH,,to choose,0603,yes,"DCR <= 0.4 ohm, Isat > 350 mA; part and height to choose"
 R2,1,47k,,,0201,yes,Sets BUCK1 to 1.8 V at power-on
-C1,1,1uF 25V,,,0402,yes,Value from Nordic's reference list; which net each capacitor sits on is not confirmed
-C2 C7 C8 C9,4,1uF,,,0201,yes,"Value from Nordic's reference list; which net each capacitor sits on is not confirmed | Load switch output; value to confirm | With the 330 ohm: at least 100 uF x ohm, as the protector asks"
-C3 C4 C5 C10,4,10uF,,,0402,yes,Value from Nordic's reference list; which net each capacitor sits on is not confirmed | Buck output: at least 4 uF effective
+C1,1,1uF 25V,,,0402,yes,"As Nordic's nPM1304 reference layout 1.0, configuration 2"
+C2 C7 C8 C9,4,1uF,,,0201,yes,"As Nordic's nPM1304 reference layout 1.0, configuration 2 | Load switch output. As Nordic's nPM1304 reference layout 1.0, configuration 2 | With the 330 ohm: at least 100 uF x ohm, as the protector asks"
+C3,1,2.2uF,,,0402,yes,"As Nordic's nPM1304 reference layout 1.0, configuration 2 (2.2 uF X7R 16 V in 0603 there)"
+C4 C5 C10,3,10uF,,,0402,yes,"Buck input, at PVDD and PVSS1. The reference has a second 10 uF on VSYS; the ring has no room for it | Buck output: at least 4 uF effective. As Nordic's nPM1304 reference layout 1.0, configuration 2"
 C6 C11 C12 C22 C23,5,100nF,,,0201,yes,"VDDIO | X7R, next to pin 7"
 R3,1,470k,,,0201,yes,"Empties the rail when the switch opens, so the light goes out with the microphone"
 R4 R5,2,10k,,,0201,yes,

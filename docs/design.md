@@ -112,6 +112,14 @@ The full list with part numbers is `electrical/out/bom.csv`.
   power chip's interrupt and reads it over I2C. No 1.8 V pin ever sees the cell voltage, and
   the switch, rated from 2 V up, stays within its rating. The cost is a few milliseconds of
   delay on each press, to be measured.
+- **The power chip's circuit is Nordic's configuration 2.** Its reference layout
+  (nPM1304-QEAA 1.0, one buck, a load switch and an LED) was opened as a board with KiCad's
+  Altium importer on 2026-11-24, which gives the net of every part. It corrected three
+  points of the draft: the unused buck's output goes to VSYS, not to ground; the cell takes
+  2.2 uF, not 10. The reference also puts two 10 uF on VSYS; the ring keeps one, at
+  the buck's input, because a second one walls in the microcontroller and the board no
+  longer routes. That layout is the QFN
+  package; the terminations are the chip's and hold for this one.
 - **Thermistor on the cell.** A 10 k thermistor next to the cell tabs lets the charger stop
   outside the cell's temperature range.
 - **Three charging pads, ground-positive-ground.** The ring can sit in its dock either way

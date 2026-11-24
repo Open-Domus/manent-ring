@@ -137,7 +137,10 @@ SOC_NETS = {
     "P2.01": "SPI_SCK", "P2.02": "SPI_SDO", "P2.04": "SPI_SDI", "P2.05": "FLASH_CS",
 }
 
-UNVERIFIED_CAPS = "Value from Nordic's reference list; which net each capacitor sits on is not confirmed"
+# Nordic's nPM1304-QEAA reference layout 1.0, configuration 2 ("one BUCK, LOADSW and LED", this
+# circuit), opened as a board with KiCad's Altium importer on 2026-11-24, gives the net of every
+# part. It is the QFN package; the chip and its terminations are the same.
+PM_REF = "As Nordic's nPM1304 reference layout 1.0, configuration 2"
 
 
 def build() -> list[Component]:
@@ -164,24 +167,25 @@ def build() -> list[Component]:
         "VBUS": "VBUS", "VBUSOUT": "VBUSOUT", "CC1": "GND", "CC2": "GND", "VBAT": "VBAT", "NTC": "NTC",
         "VSYS": "VSYS", "PVDD": "VSYS", "VDDIO": "V1V8", "AVSS": "GND", "PVSS1": "GND", "PVSS2": "GND",
         "VSET1": "VSET1", "VSET2": "GND", "SHPHLD": "BTN_N", "SW1": "SW1", "VOUT1": "V1V8",
-        "VOUT2": "GND", "LSIN1": "V1V8", "LSOUT1": "VMIC", "LSIN2": "V1V8", "LSOUT2": "VFLASH",
+        "VOUT2": "VSYS", "LSIN1": "V1V8", "LSOUT1": "VMIC", "LSIN2": "V1V8", "LSOUT2": "VFLASH",
         "SCL": "I2C_SCL", "SDA": "I2C_SDA", "GPIO0": "PMIC_INT", "GPIO1": "MIC_EN",
     }), mpn="nPM1304-CAAA-R", mfr="Nordic Semiconductor", package="WLCSP-35",
-        note="BUCK2 unused: VSET2 grounded as documented; SW2 open and VOUT2 grounded are not confirmed. "
-             "LED0-2, GPIO2-3 left open: not confirmed")
+        note="BUCK2 unused as in Nordic's reference configuration 2: VSET2 grounded, SW2 open, VOUT2 to VSYS. "
+             "LED0-2, GPIO2-3 left open")
     res("10k NTC", "NTC", "GND", "power", note="Thermistor, to sit against the cell: stops charging when hot or cold")
     add(L, "2.2uH", "power", ("SW1", "V1V8"), mpn="to choose", package="0603",
         note="DCR <= 0.4 ohm, Isat > 350 mA; part and height to choose")
     res("47k", "VSET1", "GND", "power", note="Sets BUCK1 to 1.8 V at power-on")
-    cap("1uF 25V", "VBUS", "power", pkg="0402", note=UNVERIFIED_CAPS)
-    cap("1uF", "VBUSOUT", "power", note=UNVERIFIED_CAPS)
-    cap("10uF", "VBAT", "power", pkg="0402", note=UNVERIFIED_CAPS)
-    cap("10uF", "VSYS", "power", pkg="0402", note=UNVERIFIED_CAPS)
-    cap("10uF", "V1V8", "power", pkg="0402", note="Buck output: at least 4 uF effective")
+    cap("1uF 25V", "VBUS", "power", pkg="0402", note=PM_REF)
+    cap("1uF", "VBUSOUT", "power", note=PM_REF)
+    cap("2.2uF", "VBAT", "power", pkg="0402", note=PM_REF + " (2.2 uF X7R 16 V in 0603 there)")
+    cap("10uF", "VSYS", "power", pkg="0402",
+        note="Buck input, at PVDD and PVSS1. The reference has a second 10 uF on VSYS; the ring has no room for it")
+    cap("10uF", "V1V8", "power", pkg="0402", note="Buck output: at least 4 uF effective. " + PM_REF)
     cap("100nF", "V1V8", "power", note="VDDIO")
-    cap("1uF", "VMIC", "power", note="Load switch output; value to confirm")
+    cap("1uF", "VMIC", "power", note="Load switch output. " + PM_REF)
     res("470k", "VMIC", "GND", "power", note="Empties the rail when the switch opens, so the light goes out with the microphone")
-    cap("1uF", "VFLASH", "power", note="Load switch output; value to confirm")
+    cap("1uF", "VFLASH", "power", note="Load switch output. " + PM_REF)
     res("10k", "I2C_SCL", "V1V8", "power")
     res("10k", "I2C_SDA", "V1V8", "power")
     add(TVS, "5.5V unidirectional", "power", ("VBUS", "GND"), mpn="to choose", package="0201",
