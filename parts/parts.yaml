@@ -77,21 +77,21 @@ parts:
     status: secondary        # body verified, height not extracted
     url: https://www.ablic.com/en/doc/datasheet/battery_protection/S82A1A_E.pdf
   antenna:
-    function: 2.4 GHz chip antenna
-    manufacturer: to choose
-    mpn: to choose
+    function: 2.4 GHz chip antenna, the same on all four products
+    manufacturer: Yageo (also listed under Pulse Electronics)
+    mpn: ANT1608LL14R2400A
     package: "1608 chip antenna"
     size: [1.6, 0.8, 0.4]
-    status: unverified
-    url: ""
+    status: secondary        # distributor listings: 2.4-2.484 GHz, 50 ohm, 0.40 max height; land pattern not read
+    url: https://www.lcsc.com/product-detail/C723550.html
   nfet:
-    function: Small N-channel MOSFET
-    manufacturer: to choose
-    mpn: to choose
-    package: "DFN1006 class"
+    function: Small N-channel MOSFET, the same in all eight places of the four products
+    manufacturer: Nexperia
+    mpn: PMZB290UNE2
+    package: "DFN1006B-3 (SOT883B)"
     size: [1.0, 0.6, 0.4]
-    status: unverified
-    url: ""
+    status: secondary        # Nexperia's table: 20 V, 320 mohm at 4.5 V, 480 at 2.5 V, Vgs(th) 0.95 max; height and pin order not read
+    url: https://www.nexperia.com/pip/PMZB290UNE2
   xtal32k:
     function: 32.768 kHz crystal (footprint only, not fitted)
     manufacturer: TXC

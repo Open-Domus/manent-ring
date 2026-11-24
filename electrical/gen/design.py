@@ -208,9 +208,9 @@ def build() -> list[Component]:
     res("0.5", "CELL_N", "SENSE", "power",
         note="Overcurrent sense: trips at 100 mA out and 60 mA in (50 mV and 30 mV thresholds); to check against peaks")
     res("470", "VM", "GND", "power")
-    add(NFET, "N-MOSFET, low resistance", "power", {"1": "PROT_DO", "2": "SENSE", "3": "FET_MID"}, mpn="to choose",
+    add(NFET, "N-MOSFET, low resistance", "power", {"1": "PROT_DO", "2": "SENSE", "3": "FET_MID"}, mpn="PMZB290UNE2", mfr="Nexperia", package="DFN1006B-3",
         note="Discharge FET; carries the cell current")
-    add(NFET, "N-MOSFET, low resistance", "power", {"1": "PROT_CO", "2": "GND", "3": "FET_MID"}, mpn="to choose",
+    add(NFET, "N-MOSFET, low resistance", "power", {"1": "PROT_CO", "2": "GND", "3": "FET_MID"}, mpn="PMZB290UNE2", mfr="Nexperia", package="DFN1006B-3",
         note="Charge FET; carries the cell current")
 
     # ---- microcontroller and radio (Nordic CAAA reference circuit 0.7, DC/DC, NFC off) --
@@ -243,7 +243,7 @@ def build() -> list[Component]:
     res("0", "RF_50", "ANT_FEED", "mcu_rf", note="Antenna tuning, series: value from measurement on a potted ring")
     cap("tune", "RF_50", "mcu_rf", dnp=True, note="Antenna tuning, shunt")
     cap("tune", "ANT_FEED", "mcu_rf", dnp=True, note="Antenna tuning, shunt")
-    add(ANT, "2.4 GHz", "mcu_rf", ("ANT_FEED",), mpn="to choose",
+    add(ANT, "2.4 GHz", "mcu_rf", ("ANT_FEED",), mpn="ANT1608LL14R2400A", mfr="Yageo",
         note="Chip antenna or printed trace at the band edge; decided with the first radio measurements")
 
     # ---- microphone ----------------------------------------------------------------
@@ -270,9 +270,9 @@ def build() -> list[Component]:
     add(LED, "red", "ui", ("LED_K", "VSYS"), mpn="SML-P11VT", mfr="Rohm", package="1.0x0.6x0.2",
         note="Pin 1 is the cathode. For the wearer only: about 0.1 mA")
     res("22k", "LED_K", "LED_SW", "ui", note="About 0.06-0.11 mA over the cell voltage; adjust after a look through the resin")
-    add(NFET, "N-MOSFET, small signal", "ui", {"1": "VMIC", "2": "GND", "3": "LED_SW"}, mpn="to choose",
+    add(NFET, "N-MOSFET, small signal", "ui", {"1": "VMIC", "2": "GND", "3": "LED_SW"}, mpn="PMZB290UNE2", mfr="Nexperia", package="DFN1006B-3",
         note="Gate is the microphone rail: the light is on whenever the microphone has power. Vgs(th) under 1 V")
-    add(NFET, "N-MOSFET, small signal", "ui", {"1": "LED_AUX", "2": "GND", "3": "LED_SW"}, mpn="to choose",
+    add(NFET, "N-MOSFET, small signal", "ui", {"1": "LED_AUX", "2": "GND", "3": "LED_SW"}, mpn="PMZB290UNE2", mfr="Nexperia", package="DFN1006B-3",
         note="Lets firmware blink the light for errors and charging")
     res("100k", "LED_AUX", "GND", "ui", note="Light off while the SoC is in reset")
     for label, net in (("SWDIO", "SWDIO"), ("SWDCLK", "SWDCLK")):

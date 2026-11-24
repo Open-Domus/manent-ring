@@ -15,7 +15,7 @@ R6,1,330,,,0201,yes,Protector supply filter
 U2,1,S-82A1A,ABLIC,S-82A1AAG-A6T5S (variant to confirm),DFN-6 1.4x1.4,yes,"Fit only if the cell has no protection of its own. This variant trips at 4.23 V: right for a 4.20 V cell with little margin, wrong for a 4.35 V one. Choose with the cell"
 R7,1,0.5,,,0201,yes,Overcurrent sense: trips at 100 mA out and 60 mA in (50 mV and 30 mV thresholds); to check against peaks
 R8,1,470,,,0201,yes,
-Q1 Q2,2,"N-MOSFET, low resistance",,to choose,,yes,Discharge FET; carries the cell current | Charge FET; carries the cell current
+Q1 Q2,2,"N-MOSFET, low resistance",Nexperia,PMZB290UNE2,DFN1006B-3,yes,Discharge FET; carries the cell current | Charge FET; carries the cell current
 U3,1,nRF54L15,Nordic Semiconductor,nRF54L15-CAAA-R,"WLCSP-47, 0.3 mm pitch",yes,Light-sensitive package: the resin around it must be opaque
 L2,1,4.7uH,TDK,PLEA67BCA4R7M-1PT00,0402,yes,
 C13 C14 C16,3,2.2uF,Murata,GRM033R61A225KE47,0201,yes,
@@ -29,12 +29,12 @@ C18 C19,2,1.2pF,Murata,GJM0335C1H1R2WB01D,0201,yes,
 L5,1,2.0nH,Murata,LQP03HQ2N0B02,0201,yes,
 R9,1,0,,,0201,yes,"Antenna tuning, series: value from measurement on a potted ring"
 C20 C21,2,tune,,,0201,no,"Antenna tuning, shunt"
-AE1,1,2.4 GHz,,to choose,,yes,Chip antenna or printed trace at the band edge; decided with the first radio measurements
+AE1,1,2.4 GHz,Yageo,ANT1608LL14R2400A,,yes,Chip antenna or printed trace at the band edge; decided with the first radio measurements
 MK1,1,T5838,TDK InvenSense,MMICT5838-00-012,3.5x2.65x0.98 bottom port,yes,No pull resistor on DATA. Board hole 0.5-1.0 mm under the port
 U4,1,W25Q128JW,Winbond,W25Q128JWYIQ (or thin W25Q128JWKIQ),"WLCSP-21, 0.5 mm pitch",yes,"Special-order package; body size not published, ask Winbond"
 R10 R11 R12 R14,4,100k,,,0201,yes,Keeps the chip deselected while the rail rises | Termination in single-bit SPI not stated in the datasheet | Light off while the SoC is in reset
 SW1,1,tactile,Panasonic,EVPBB2A9B000,2.6x1.6x0.53,yes,1.6 N; pulled up inside the PMIC (SHPHLD). The SoC learns of presses from the PMIC interrupt
 D2,1,red,Rohm,SML-P11VT,1.0x0.6x0.2,yes,Pin 1 is the cathode. For the wearer only: about 0.1 mA
 R13,1,22k,,,0201,yes,About 0.06-0.11 mA over the cell voltage; adjust after a look through the resin
-Q3 Q4,2,"N-MOSFET, small signal",,to choose,,yes,Gate is the microphone rail: the light is on whenever the microphone has power. Vgs(th) under 1 V | Lets firmware blink the light for errors and charging
+Q3 Q4,2,"N-MOSFET, small signal",Nexperia,PMZB290UNE2,DFN1006B-3,yes,Gate is the microphone rail: the light is on whenever the microphone has power. Vgs(th) under 1 V | Lets firmware blink the light for errors and charging
 R15 R16,2,100,,,0201,yes,Between the chip and a pad that touches the skin
